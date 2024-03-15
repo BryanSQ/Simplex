@@ -11,10 +11,10 @@ const Inputs = () => {
       <div>
         {
           Array.from({length: variables}, (_, i) => (
-            <div key={i}>
+            <span key={i}>
               <label htmlFor={`input-x${i}`}>X{i + 1}:</label>
               <input id={`input-x${i}`} type="number" />
-            </div>
+            </span>
           ))
         }
       </div>

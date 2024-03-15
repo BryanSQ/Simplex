@@ -8,23 +8,23 @@ const Restrictions = () => {
   const handleSubmit = (e) => {
     e.preventDefault()
     // get data from inputs
-    const inputs = Array.from(e.target.elements)    
+    const inputs = Array.from(e.target.elements)
     inputs.pop()
 
     const rests = []
     let k = 0
-    for (let i = 0; i < restricciones; i++) {    
+    for (let i = 0; i < restricciones; i++) {
       const rest = {}
-      for (let j = 0; j < Number(variables) + 2; j++) {        
+      for (let j = 0; j < Number(variables) + 2; j++) {
         if (inputs[k].value === '>=' || inputs[k].value === '<=' || inputs[k].value === '=') {
-          rest['comp'] = inputs[k].value                   
+          rest['comp'] = inputs[k].value
         }
-        else if (j === Number(variables) + 1){
+        else if (j === Number(variables) + 1) {
           rest['res'] = inputs[k].value
         }
-        else{
-          console.log({k});
-          rest[`x${j + 1}`] = inputs[k].value        
+        else {
+          console.log({ k });
+          rest[`x${j + 1}`] = inputs[k].value
         }
         k++
       }
@@ -41,28 +41,28 @@ const Restrictions = () => {
       <h1>Restricciones</h1>
       <div>
         <form onSubmit={handleSubmit}>
-        {
-          Array.from({length: restricciones}, (_, i) => (
-            <div key={i}>
-              {
-                Array.from({length: variables}, (_, j) => (
-                  <div key={j}>
-                    <label htmlFor={`input-restriccion-${i}-${j}`}>X{j + 1}:</label>
-                    <input id={`input-restriccion-${i}-${j}`} type="number" />
-                  </div>
-                ))
-              }
-              <select id={`select-${i}`}>
-                <option value="<=">{"<="}</option>
-                <option value=">=">{">="}</option>
-                <option value="=">{"="}</option>
-              </select>
-              <input type="number" id={`input-res${i+1}`}/>              
-            </div>            
-          ))          
-        }
-        <button type="submit">Enviar</button>
-        </form>   
+          {
+            Array.from({ length: restricciones }, (_, i) => (
+              <span key={i}>
+                {
+                  Array.from({ length: variables }, (_, j) => (
+                    <span key={j}>
+                      <label htmlFor={`input-restriccion-${i}-${j}`}>X{j + 1}:</label>
+                      <input id={`input-restriccion-${i}-${j}`} type="number" />
+                    </span>
+                  ))
+                }
+                <select id={`select-${i}`}>
+                  <option value="<=">{"<="}</option>
+                  <option value=">=">{">="}</option>
+                  <option value="=">{"="}</option>
+                </select>
+                <input type="number" id={`input-res${i + 1}`} />
+              </span>
+            ))
+          }
+          <button type="submit">Enviar</button>
+        </form>
       </div>
     </div>
   )
