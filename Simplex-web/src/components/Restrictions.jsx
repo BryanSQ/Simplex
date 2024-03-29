@@ -1,6 +1,10 @@
-import { useSelector } from "react-redux"
+import { useSelector, useDispatch } from "react-redux"
+import { setRestrictions } from "../reducers/simplexReducer"
+import Simplex from "../simplex"
 
 const Restrictions = () => {
+  const dispatch = useDispatch()
+
   const restricciones = useSelector(state => state.config.restricciones)
   const variables = useSelector(state => state.config.variables)
 
@@ -22,23 +26,21 @@ const Restrictions = () => {
         else if (j === Number(variables) + 1) {
           rest['res'] = inputs[k].value
         }
-        else {
-          console.log({ k });
+        else {          
           rest[`x${j + 1}`] = inputs[k].value
         }
         k++
       }
-      rests.push(rest)
-      console.log('---');
+      rests.push(rest)      
     }
-    console.log(rests)
-    const values = inputs.map(input => input.value)
-    console.log(values)
+    //console.log(rests)
+    dispatch(setRestrictions(rests))
+    Simplex()
   }
 
   return (
     <div>
-      <h1>Restricciones</h1>
+      <h2>Restricciones</h2>
       <div>
         <form onSubmit={handleSubmit}>
           {
@@ -61,7 +63,7 @@ const Restrictions = () => {
               </span>
             ))
           }
-          <button type="submit">Enviar</button>
+          <button type="submit">Guardar</button>
         </form>
       </div>
     </div>

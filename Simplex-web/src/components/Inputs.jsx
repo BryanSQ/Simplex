@@ -1,22 +1,14 @@
 import { useSelector } from "react-redux"
 import Restrictions from "./Restrictions"
+import Variables from "./Variables"
 
 const Inputs = () => {
-  const variables = useSelector(state => state.config.variables)
   const objetivo = useSelector(state => state.config.objetivo)
 
   return (
-    <div>
-      Inputs
+    <div>      
       <div>
-        {
-          Array.from({length: variables}, (_, i) => (
-            <span key={i}>
-              <label htmlFor={`input-x${i}`}>X{i + 1}:</label>
-              <input id={`input-x${i}`} type="number" />
-            </span>
-          ))
-        }
+        <Variables />
       </div>
       <div>
         <Restrictions />
