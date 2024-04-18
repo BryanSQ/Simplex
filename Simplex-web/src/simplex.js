@@ -102,6 +102,14 @@ const simplexProcess = (matrix, BVS, header) => {
         console.log(matrix);
         matrix = rowMult(matrix, pivotRow.index, 1/pivotValue);
         console.log(matrix);
+        
+
+
+        matrix = rowAddition(matrix, pivotRow.index, 0, -matrix[0][pivot]);
+        console.log(matrix);
+        matrix = rowAddition(matrix, pivotRow.index, 2, -matrix[2][pivot]);
+        console.log('Despues de la segunda operacion fila');
+        console.log(matrix);
         break;
     }
 }
@@ -115,13 +123,15 @@ const rowMult = (matrix, rowIndex, k) => {
     })
 }
 
-
-const matMult = (matrix, row, k) => {
-    return matrix.map((m, i) => {
-        return m.map((n, j) => {
-            return n + row[i] * k;
-        })
-    })
-}
+// function to multiply a row by a constant and add it to another row, and return the new matrix
+const rowAddition = (matrix, sourceRowIndex, targetRowIndex, k) => {
+    return matrix.map((row, i) => {
+        if (i === targetRowIndex) {
+            return row.map((n, j) => n + matrix[sourceRowIndex][j] * k);
+        } else {
+            return row;
+        }
+    });
+};
 
 export default Simplex
