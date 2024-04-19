@@ -1,6 +1,8 @@
 import { useSelector, useDispatch } from "react-redux"
 import { setVariables } from "../reducers/simplexReducer"
 
+import '../styles/Variables.css'
+
 const Variables = () => {
   const dispatch = useDispatch()
 
@@ -24,7 +26,7 @@ const Variables = () => {
   }
 
   return (
-    <div>
+    <div id="variables-container">
       <h2>Variables</h2>
       <div>
         <form onSubmit={handleSubmit}>
@@ -32,12 +34,14 @@ const Variables = () => {
           Array.from({length: variables}, (_, i) => (
             
               <span key={i}>
-                <label htmlFor={`input-x${i}`}>X{i + 1}:</label>
                 <input id={`input-x${i}`} type="number" />
+                <label htmlFor={`input-x${i}`}>X{i + 1}</label>
               </span>
           ))
         }
+        <div>
           <button type="submit">Guardar</button>
+        </div>
         </form>
       </div>
     </div>

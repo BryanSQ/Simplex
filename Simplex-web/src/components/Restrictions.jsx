@@ -2,6 +2,8 @@ import { useSelector, useDispatch } from "react-redux"
 import { setRestrictions } from "../reducers/simplexReducer"
 import Simplex from "../simplex"
 
+import '../styles/Restrictions.css'
+
 const Restrictions = () => {
   const dispatch = useDispatch()
 
@@ -39,22 +41,22 @@ const Restrictions = () => {
   }
 
   return (
-    <div>
+    <div id="restrictions-container">
       <h2>Restricciones</h2>
       <div>
         <form onSubmit={handleSubmit}>
           {
             Array.from({ length: restricciones }, (_, i) => (
-              <span key={i}>
+              <span key={i} className="restriction-row">
                 {
                   Array.from({ length: variables }, (_, j) => (
-                    <span key={j}>
-                      <label htmlFor={`input-restriccion-${i}-${j}`}>X{j + 1}:</label>
+                    <span key={j} className="restriction-item">
                       <input id={`input-restriccion-${i}-${j}`} type="number" />
+                      <label htmlFor={`input-restriccion-${i}-${j}`}>X{j + 1}</label>
                     </span>
                   ))
                 }
-                <select id={`select-${i}`}>
+                <select id={`select-${i}`} className="equality">
                   <option value="<=">{"<="}</option>
                   <option value=">=">{">="}</option>
                   <option value="=">{"="}</option>
@@ -63,7 +65,9 @@ const Restrictions = () => {
               </span>
             ))
           }
-          <button type="submit">Guardar</button>
+          <div>
+            <button type="submit">Guardar</button>
+          </div>
         </form>
       </div>
     </div>
