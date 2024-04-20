@@ -3,6 +3,8 @@ import Store from "./store";
 const Simplex = () => {
     // access the simplex reducer
     const {variables, restrictions} = Store.getState().simplex;
+    console.log(restrictions);
+     buildRestrictions(restrictions);
 
     // create a matrix with the simplex data and BVS
     const {BVS, matrix, header} = buildMatrix(variables, restrictions);
@@ -10,7 +12,9 @@ const Simplex = () => {
 
     console.log(BVS, matrix);
 
-    simplexProcess(matrix, BVS, header);
+    const processedMatrix = simplexProcess(matrix, BVS, header);
+
+    console.log('After simplex', processedMatrix);
 
     //console.log(variables, restrictions);
 }
@@ -28,17 +32,23 @@ const buildZ = (variables, rows) =>{
     return z;
 }
 
-const buildSlack = (restrictions) => {
-    const slack = restrictions.map((restriction, key) => {
-        const values = Object.keys(restriction)
-            .filter(key => key !== 'comp' && key !== 'res')
-            .map(key => Number(restriction[key]))
-        const zeros = new Array(restrictions.length).fill(0);
-        zeros[key] = 1;
-        return [...values, ...zeros, Number(restriction['res'])]
-        
-    })    
-    return slack;
+const buildRestrictions = (restrictions) => {
+    // if the restriction is a <=, we need to add a slack variable to the matrix
+    // if the restriction is a =, we need to add a artificial variable to the matrix
+    // if the restriction is a >=, we need to add a surplus variable to the matrix
+    for (let i = 0; i < restrictions.length; i++) {
+        const restriction = restrictions[i];
+        const restrictionValue = Number(restriction[Object.keys(restriction)[0]]);
+        const restrictionType = Object.keys(restriction)[0];
+        if (restrictionType === '<=') {
+            restrictions[i] = {...restriction, s: 1, a: 0, r: restrictionValue} //[0,0,0,0,1]
+        } else if (restrictionType === '=') {
+            restrictions[i] = {...restriction, s: 0, a: 1, r: restrictionValue} //[0,0,0,0,0,0, 1]
+        } else {
+            restrictions[i] = {...restriction, s: -1, a: 1, r: restrictionValue} //[0,0,0,0,0,0, -1, 1]
+        }
+    }
+    console.log(restrictions);
 }
 
 const buildBVS = (variables, restrictions) => {
@@ -76,48 +86,52 @@ const findPivot = (z) => {
 }
 
 const simplexProcess = (matrix, BVS, header) => {
-
     while (matrix[0].some(value => value < 0)) {
         const pivot = findPivot(matrix[0]);
-        //const pivotColumn = matrix.map(row => row[pivot]);
-        const ratios = matrix.slice(1).map((row, key) => {
-            const value = row[row.length - 1];
-            const pivotValue = row[pivot];
-
-            if (pivotValue <= 0) {
-                return {index: key+1, value: Infinity}
-            }
-            return {index: key+1, value: value/pivotValue}
-        })
-
-        // get the lowest ratio
-        const pivotRow = ratios.reduce((prev, current) => {
-            return prev.value < current.value ? prev : current;
-        })
-        
+        const pivotRow = findPivotRow(matrix, pivot);
         BVS[pivotRow.index] = header[pivot];
-        
         const pivotValue = matrix[pivotRow.index][pivot];
         console.log(pivotValue);
-        console.log(matrix);
-        matrix = rowMult(matrix, pivotRow.index, 1/pivotValue);
-        console.log(matrix);
-        
-
-
-        matrix = rowAddition(matrix, pivotRow.index, 0, -matrix[0][pivot]);
-        console.log(matrix);
-        matrix = rowAddition(matrix, pivotRow.index, 2, -matrix[2][pivot]);
-        console.log('Despues de la segunda operacion fila');
-        console.log(matrix);
-        break;
+        console.log('Before iteration', matrix);
+        matrix = iteration(matrix, pivotRow.index, pivot, pivotValue);
     }
+    return matrix;
+}
+
+const findPivotRow = (matrix, pivot) => {
+    const ratios = matrix.slice(1).map((row, key) => {
+        const value = row[row.length - 1];
+        const pivotValue = row[pivot];
+
+        if (pivotValue <= 0) {
+            return {index: key+1, value: Infinity}
+        }
+        return {index: key+1, value: value/pivotValue}
+    })
+    const pivotRow = ratios.reduce((prev, current) => {
+        return prev.value < current.value ? prev : current;
+    })
+    return pivotRow;
+}
+
+const iteration = (matrix, pivotRow, pivotCol, pivotValue) =>{   
+    if (pivotValue != 1){
+        matrix = rowMult(matrix, pivotRow, 1/pivotValue);
+    }
+    
+    for (let i = 0; i < matrix.length; i++) {
+        if (i !== pivotRow && matrix[i][pivotCol] !== 0) {
+            matrix = rowAddition(matrix, pivotRow, i, -matrix[i][pivotCol]);
+            console.log(matrix);
+        }      
+    }
+    return matrix;
 }
 
 // function to multiply a row of a matrix by a constant
 const rowMult = (matrix, rowIndex, k) => {
     return matrix.map((row, i) => {
-        return row.map((n, j) => {
+        return row.map(n  => {
             return i === rowIndex ? n * k : n;
         })
     })
