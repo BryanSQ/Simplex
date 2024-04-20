@@ -1,5 +1,6 @@
 import Config from "./components/Config"
 import Inputs from "./components/Inputs"
+import Table from "./components/Table"
 
 import './App.css'
 
@@ -11,6 +12,7 @@ function App() {
       <h1>Simplex</h1>
       <Config />
       <Inputs />
+      <Table />
     </div>
   )
 }

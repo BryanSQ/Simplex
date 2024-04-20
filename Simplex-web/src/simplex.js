@@ -1,4 +1,7 @@
 import Store from "./store";
+import { setMatrix, setHeader, setBVS } from './reducers/tableReducer';
+
+
 
 const Simplex = () => {
     // access the simplex reducer
@@ -8,6 +11,7 @@ const Simplex = () => {
 
     const {BVS, matrix, header} = buildMatrix(variables, restrictions);
     
+    Store.dispatch(setHeader(header));
 
     console.log(BVS, matrix, header);
 
@@ -147,6 +151,9 @@ const simplexProcess = (matrix, BVS, header) => {
         const pivotRow = findPivotRow(matrix, pivot);
         BVS[pivotRow.index] = header[pivot];
         const pivotValue = matrix[pivotRow.index][pivot];
+        console.log(pivotValue);
+        console.log('Before iteration', matrix);
+        Store.dispatch(setBVS(BVS));
         matrix = iteration(matrix, pivotRow.index, pivot, pivotValue);
     }
     return matrix;
@@ -176,9 +183,8 @@ const iteration = (matrix, pivotRow, pivotCol, pivotValue) =>{
     for (let i = 0; i < matrix.length; i++) {
         if (i !== pivotRow && matrix[i][pivotCol] !== 0) {
             matrix = rowAddition(matrix, pivotRow, i, -matrix[i][pivotCol]);
-
-            // salvar resultados para la tabla
-            // console.log(matrix);
+            console.log(matrix);
+            Store.dispatch(setMatrix(matrix));
         }      
     }
     return matrix;
