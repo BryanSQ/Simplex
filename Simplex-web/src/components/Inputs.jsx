@@ -68,6 +68,8 @@ const Inputs = () => {
     handleRestrictionsSubmit(rests)
   };
 
+
+
   return (
     <div>
       <div>
