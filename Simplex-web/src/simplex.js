@@ -149,8 +149,9 @@ const simplexProcess = (matrix, BVS, header) => {
         const pivotRow = findPivotRow(matrix, pivot);
         BVS[pivotRow.index] = header[pivot];
         const pivotValue = matrix[pivotRow.index][pivot];
-        Store.dispatch(setBVS(...BVS));
+        Store.dispatch(setBVS([...BVS]));
         matrix = iteration(matrix, pivotRow.index, pivot, pivotValue);
+        Store.dispatch(setMatrix(matrix));
     }
     return matrix;
 }
@@ -178,8 +179,7 @@ const iteration = (matrix, pivotRow, pivotCol, pivotValue) =>{
     
     for (let i = 0; i < matrix.length; i++) {
         if (i !== pivotRow && matrix[i][pivotCol] !== 0) {
-            matrix = rowAddition(matrix, pivotRow, i, -matrix[i][pivotCol]);            
-            Store.dispatch(setMatrix(matrix));
+            matrix = rowAddition(matrix, pivotRow, i, -matrix[i][pivotCol]);                         
         }      
     }
     return matrix;

@@ -113,7 +113,7 @@ const Inputs = () => {
                 </div>
               </div>
               <div>
-                <button type="submit">Guardar</button>
+                <button type="submit">Iniciar</button>
               </div>
             </form>
           </div>
