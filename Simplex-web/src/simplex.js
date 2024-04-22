@@ -46,6 +46,49 @@ const buildZ = (variables, rows) =>{
     return z;
 }
 
+const buildBigMZ = (variables, slackCount, artificialCount) => {
+    const z = variables.map((variable) => {
+        const v = Number(variable[Object.keys(variable)[0]])
+        return v * -1
+    })
+
+    for (let i = 0; i < slackCount; i++) {
+        z.push(0);
+    }
+
+    for (let i = 0; i < artificialCount; i++) {
+        z.push(1000);
+    }
+
+    z.push(0);
+    console.log(z);
+    return z;
+}
+
+const buildTwoPhaseZ = (variables, slackCount, artificialCount) => {
+    const total = variables.length + slackCount + artificialCount;
+    const begin = []
+    let w = []
+    for (let i = 0; i < total; i++) {
+       if (i < (variables.length + slackCount)) {
+           w.push(0);
+       } else {
+           w.push(1);
+       }
+    }
+
+    w.push(0);
+
+    const z = buildZ(variables, (slackCount + artificialCount + 1));
+    
+    begin.push(w);
+    begin.push(z);
+
+    return begin;
+    
+}
+  
+
 const buildRestrictions = (restrictions) => {
     // if the restriction is a <=, we need to add a slack variable to the matrix
     // if the restriction is a =, we need to add a artificial variable to the matrix
@@ -123,8 +166,15 @@ const buildMatrix = (variables, restrictions) => {
     const { slackCount, artificialCount } = getOtherVariablesCount(restrictions);
     const BVS = buildBVS(variables.length, { slackCount, artificialCount });
     const rows = slackCount + artificialCount + 1;
-
-    const z = buildZ(variables, rows);
+    let z = [];
+    if (artificialCount > 0) {
+        z = buildTwoPhaseZ(variables, slackCount, artificialCount);
+        console.table(z);
+    } else {
+        z = buildZ(variables, rows);
+    }
+    
+    //const z = buildZ(variables, rows);
     matrix.push(z);
     const restrictionMatrix = buildRestrictions(restrictions);
     

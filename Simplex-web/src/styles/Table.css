@@ -16,3 +16,31 @@
   border: 1px solid #bdc3c7;
 }
 
+
+/* Table.css */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  color: #fff; /* Color del texto */
+}
+
+th, td {
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #333; /* Cambia el color del borde */
+}
+
+th {
+  background-color: #555; /* Color de fondo para las celdas de encabezado */
+}
+
+tbody tr:nth-child(1) {
+  background-color: #333; /* Color de fondo para las filas pares */
+}
+
+tbody tr:hover {
+  background-color: #444; /* Color de fondo para el hover */
+}
+
