@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { setVariables, setRestricciones, setObjetivo } from '../reducers/configReducer'
+import { setVariables, setRestricciones, setTarget } from '../reducers/configReducer'
 
 import '../styles/Config.css'
 
@@ -18,9 +18,9 @@ const Config = () => {
       dispatch(setRestricciones(e.target.value))
     }
 
-    const handleObjetivo = (e) => {
+    const handleTarget = (e) => {
       setSelectedValue(e.target.value)
-      dispatch(setObjetivo(e.target.value))
+      dispatch(setTarget(e.target.value))
     }
 
     return (
@@ -28,8 +28,8 @@ const Config = () => {
         <h1>Config</h1>
         <form>
           <div>
-            <label htmlFor="select-objetivo">Objetivo:</label>
-            <select id="select-objetivo" value={selectedValue} onChange={handleObjetivo}>
+            <label htmlFor="select-Target">Target:</label>
+            <select id="select-Target" value={selectedValue} onChange={handleTarget}>
               <option value="max" >Maximizar</option>
               <option value="min">Minimizar</option>
             </select>
