@@ -1,52 +1,45 @@
 import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { resetTable } from '../reducers/tableReducer'
 import '../styles/Table.css'
 
 const Table = () => {
 
+    const dispatch = useDispatch()
+
     const [showTable, setShowTable] = useState(false)
-
-    const [steps, setSteps] = useState(undefined) // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9
     const [currentStep, setCurrentStep] = useState(0) // 0
-    const [data, setData] = useState(undefined) // [0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+    const [data, setData] = useState([])
 
-    // llena data de informacion de una matrix de simplex
     const header = useSelector((state) => state.table.header)
-    const fullHeader = ['BVS',...header, "RHS"]
-    const BVS = useSelector((state) => state.table.BVS)
-    const matrix =useSelector((state) => state.table.matrix)    
-    //data = data[data.length - 1]
-
+    const fullHeader = ['i','BVS',...header, "RHS"] 
+    let steps = useSelector((state) => state.table.steps)
 
     useEffect(() => {
-        if (header.length > 0 && BVS.length > 0 && matrix.length > 0){   
-            console.log(BVS);
-            setSteps(matrix)
-            setData(matrix[0].map((row, i) => [i, BVS[i], ...row]))
+        if (steps.length > 0){
             setShowTable(true)
-        }
-        
-    }, [matrix, BVS, header])
+            setData(steps)
+        }        
+    }, [steps])
 
 
     const nextStep = () => {
         if (currentStep < steps.length - 1) {
-            setCurrentStep(currentStep + 1)
-            setData(steps[currentStep])
+            setCurrentStep(currentStep + 1)            
         }
     }
 
     const prevStep = () => {
         if (currentStep > 0) {
             setCurrentStep(currentStep - 1)
-            setData(steps[currentStep])
         }
     }
 
     const reset = () => {
         setCurrentStep(0)
-        setData(steps[0])
         setShowTable(false)
+        setData([])
+        dispatch(resetTable())
     }
 
     if (!showTable) {
@@ -64,7 +57,7 @@ const Table = () => {
                 </tr>
             </thead>
             <tbody>
-                {data.map((row, key) => (
+                {data[currentStep].map((row, key) => (
                     <tr key={key}>
                         {row.map((item, key) => (
                             <td key={key}>{item}</td>

@@ -1,13 +1,17 @@
 import Store from "../store";
-import { setMatrix, setBVS } from '../reducers/tableReducer';
+import { setSteps } from '../reducers/tableReducer';
 
 const iteration = (matrix, pivotRow, pivotCol, pivotValue) =>{
     if (pivotValue != 1){
+        console.log('row operation', `1/${pivotValue}f${pivotRow} => f${pivotRow}`);
         matrix = rowMult(matrix, pivotRow, 1/pivotValue);
+        console.table(matrix);
     }
     
     for (let i = 0; i < matrix.length; i++) {
         if (i !== pivotRow && matrix[i][pivotCol] !== 0) {
+            console.log({i,pivotCol, pivotRow});
+            console.log('row operation', `${-matrix[i][pivotCol]}f${pivotCol} + f${i} => f${i}`);
             matrix = rowAddition(matrix, pivotRow, i, -matrix[i][pivotCol]);
             console.table(matrix);
         }      
@@ -170,6 +174,7 @@ const buildZ = (variables, rows, target) =>{
 }
 
 const simplexProcess = (matrix, BVS, header) => {
+    Store.dispatch(setSteps(matrix.map((row, i) => [i, BVS[i], ...row])));
     while (matrix[0].slice(0, matrix[0].length-1).some(value => value < 0)) {
         const pivot = findPivot(matrix[0]);
         const pivotRow = findPivotRow(matrix, pivot);
@@ -179,15 +184,16 @@ const simplexProcess = (matrix, BVS, header) => {
         }
         BVS[pivotRow.index] = header[pivot];
         const pivotValue = matrix[pivotRow.index][pivot];
-        Store.dispatch(setBVS([...BVS]));
+        console.log('inicio de iteracion', {pivotRow, pivot, pivotValue});
         matrix = iteration(matrix, pivotRow.index, pivot, pivotValue);
-        Store.dispatch(setMatrix(matrix));
+        const step = matrix.map((row, i) => [i, BVS[i], ...row]);
+        Store.dispatch(setSteps(step));
     }
 
     return matrix;
 }
 
-const buildMatrix = (variables, restrictions, target, Z) => {
+const buildMatrix = (variables, restrictions, Z) => {
     const matrix = [];
     const { slackCount, artificialCount } = getOtherVariablesCount(restrictions);
     const BVS = buildBVS(variables.length, { slackCount, artificialCount });
