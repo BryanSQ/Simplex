@@ -2,6 +2,7 @@ import Store from "../store";
 import { resetTable, setHeader } from '../reducers/tableReducer';
 import { showMatrix, showResults, buildZ, simplexProcess, buildMatrix, getOtherVariablesCount } from "./utils";
 import { buildBigMZ, simplexBigM } from "./simplexBigM";
+import { buildTwoPhaseZ, simplexTwoPhases } from "./simplexTwoPhases";
 
 const Simplex = () => {
     // access the simplex reducer
@@ -31,7 +32,9 @@ const Simplex = () => {
         processedMatrix = simplexBigM(arrays.matrix, arrays.BVS, arrays.header, artificialCount);
     }
     else if (method === 'two-phase') {
-        console.log('WIP');
+        Z = buildTwoPhaseZ(variables, slackCount, artificialCount, target);
+        arrays = buildMatrix(variables, restrictions, target, Z);
+        processedMatrix = simplexTwoPhases(arrays.matrix, arrays.BVS, arrays.header, artificialCount);
     }
     else {
         console.log('Invalid method');
@@ -43,6 +46,11 @@ const Simplex = () => {
     }
     
     Store.dispatch(setHeader(arrays.header));
+
+    console.log('Processed matrix');
+    console.table(processedMatrix);
+    console.log(arrays.BVS);
+    console.log(arrays.header);
 
     showMatrix(processedMatrix, arrays.BVS, arrays.header);
     showResults(processedMatrix, arrays.BVS);

@@ -12,7 +12,6 @@ const iteration = (matrix, pivotRow, pivotCol, pivotValue) =>{
         if (i !== pivotRow && matrix[i][pivotCol] !== 0) {            
             // console.log('row operation', `${-matrix[i][pivotCol]}f${pivotCol} + f${i} => f${i}`);
             matrix = rowAddition(matrix, pivotRow, i, -matrix[i][pivotCol]);
-            // console.table(matrix);
         }      
     }
     return matrix;
@@ -187,8 +186,9 @@ const simplexProcess = (matrix, BVS, header) => {
         const step = matrix.map((row, i) => [i, BVS[i], ...row]);
         Store.dispatch(setSteps(step));
     }
+    
 
-    return matrix;
+    return { matrix,  BVS, header };
 }
 
 const buildMatrix = (variables, restrictions, Z) => {
@@ -196,9 +196,14 @@ const buildMatrix = (variables, restrictions, Z) => {
     const { slackCount, artificialCount } = getOtherVariablesCount(restrictions);
     const BVS = buildBVS(variables.length, { slackCount, artificialCount });
     
-    matrix.push(Z);
-    const restrictionMatrix = buildRestrictions(restrictions);
+    if (Array.isArray(Z[0])){
+        matrix.push(Z[0]);
+        matrix.push(Z[1]);
+    } else{
+        matrix.push(Z);
+    }
     
+    const restrictionMatrix = buildRestrictions(restrictions);
     matrix.push(...restrictionMatrix);
 
     const header = []
@@ -208,5 +213,11 @@ const buildMatrix = (variables, restrictions, Z) => {
     return {matrix, BVS, header};
 }
 
+function removeColumn(matrix, column) {
+    return matrix.map(row => {
+        return [...row.slice(0, column), ...row.slice(column + 1)];
+    });
+}
 
-export { iteration, findPivotRow, showMatrix, showResults, buildBVS, findPivot, buildRestrictions, getOtherVariablesCount, buildZ, rowMult, rowAddition, simplexProcess, buildMatrix };
+
+export { iteration, findPivotRow, showMatrix, showResults, buildBVS, findPivot, buildRestrictions, getOtherVariablesCount, buildZ, rowMult, rowAddition, simplexProcess, buildMatrix, removeColumn };

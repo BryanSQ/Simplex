@@ -31,7 +31,7 @@ const simplexBigM = (matrix, BVS, header, artificialCount) => {
             }
         }         
     }
-    const newMatrix = simplexProcess(matrix, BVS, header);
+    const newMatrix = simplexProcess(matrix, BVS, header).matrix;
     return newMatrix;
 }
 
