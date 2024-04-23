@@ -3,7 +3,8 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   variables: 1,
   restricciones: 1,
-  target: 'max'
+  target: 'max',
+  method: 'simplex'
 }
 
 
@@ -19,9 +20,12 @@ const configSlice = createSlice({
     },
     setTarget(state, action) {
       state.target = action.payload
+    },
+    setMethod(state, action) {
+      state.method = action.payload
     }
   }
 });
 
-export const { setVariables, setRestricciones, setTarget } = configSlice.actions;
+export const { setVariables, setRestricciones, setTarget, setMethod } = configSlice.actions;
 export default configSlice.reducer;

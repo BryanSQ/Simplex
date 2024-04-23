@@ -1,14 +1,15 @@
-import Store from "./store";
-import { setMatrix, setHeader, setBVS } from './reducers/tableReducer';
+import Store from "../store";
+import { setMatrix, setBVS } from '../reducers/tableReducer';
 
-const iteration = (matrix, pivotRow, pivotCol, pivotValue) =>{   
+const iteration = (matrix, pivotRow, pivotCol, pivotValue) =>{
     if (pivotValue != 1){
         matrix = rowMult(matrix, pivotRow, 1/pivotValue);
     }
     
     for (let i = 0; i < matrix.length; i++) {
         if (i !== pivotRow && matrix[i][pivotCol] !== 0) {
-            matrix = rowAddition(matrix, pivotRow, i, -matrix[i][pivotCol]);                         
+            matrix = rowAddition(matrix, pivotRow, i, -matrix[i][pivotCol]);
+            console.table(matrix);
         }      
     }
     return matrix;
@@ -86,7 +87,7 @@ const buildBVS = (variables, { slackCount, artificialCount }) => {
 }
 
 const findPivot = (z) => {
-    const min = Math.min(...z);
+    const min = Math.min(...z.slice(0, z.length - 1));
     const index = z.indexOf(min);
     return index;
 }
@@ -169,7 +170,7 @@ const buildZ = (variables, rows, target) =>{
 }
 
 const simplexProcess = (matrix, BVS, header) => {
-    while (matrix[0].some(value => value < 0)) {
+    while (matrix[0].slice(0, matrix[0].length-1).some(value => value < 0)) {
         const pivot = findPivot(matrix[0]);
         const pivotRow = findPivotRow(matrix, pivot);
         if (pivotRow === -1) {
@@ -186,5 +187,22 @@ const simplexProcess = (matrix, BVS, header) => {
     return matrix;
 }
 
+const buildMatrix = (variables, restrictions, target, Z) => {
+    const matrix = [];
+    const { slackCount, artificialCount } = getOtherVariablesCount(restrictions);
+    const BVS = buildBVS(variables.length, { slackCount, artificialCount });
+    
+    matrix.push(Z);
+    const restrictionMatrix = buildRestrictions(restrictions);
+    
+    matrix.push(...restrictionMatrix);
 
-export { iteration, findPivotRow, showMatrix, showResults, buildBVS, findPivot, buildRestrictions, getOtherVariablesCount, buildZ, rowMult, rowAddition, simplexProcess };
+    const header = []
+    header.push(...variables.map((variable) => Object.keys(variable)[0]));
+    header.push(...BVS.slice(1));
+
+    return {matrix, BVS, header};
+}
+
+
+export { iteration, findPivotRow, showMatrix, showResults, buildBVS, findPivot, buildRestrictions, getOtherVariablesCount, buildZ, rowMult, rowAddition, simplexProcess, buildMatrix };

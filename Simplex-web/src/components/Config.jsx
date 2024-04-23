@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { setVariables, setRestricciones, setTarget } from '../reducers/configReducer'
+import { setVariables, setRestricciones, setTarget, setMethod } from '../reducers/configReducer'
 
-import '../styles/Config.css'
+// import '../styles/Config.css'
 
 const Config = () => {
 
     const [selectedValue, setSelectedValue] = useState("max")
+    const [simplexMethod, setSimplexMethod] = useState("simplex")
 
     const dispatch = useDispatch()
 
@@ -14,6 +15,7 @@ const Config = () => {
     const handleVariables = (e) => {
       dispatch(setVariables(e.target.value))
     }
+
     const handleRestricciones = (e) => {
       dispatch(setRestricciones(e.target.value))
     }
@@ -23,15 +25,28 @@ const Config = () => {
       dispatch(setTarget(e.target.value))
     }
 
+    const handleMethod = (e) => {
+      setSimplexMethod(e.target.value)
+      dispatch(setMethod(e.target.value))
+    }
+
     return (
-      <section id="config-section">
-        <h1>Config</h1>
+      <section className='container'>
+        <h2>Config</h2>
         <form>
           <div>
-            <label htmlFor="select-Target">Target:</label>
+            <label htmlFor="select-Target">Objetivo:</label>
             <select id="select-Target" value={selectedValue} onChange={handleTarget}>
               <option value="max" >Maximizar</option>
               <option value="min">Minimizar</option>
+            </select>
+          </div>
+          <div>
+            <label htmlFor="method">Método:</label>
+            <select id="method" value={simplexMethod} onChange={handleMethod}>
+              <option value="simplex">Simplex</option>
+              <option value="big-m">Gran M</option>
+              <option value="two-phase">Dos Fases</option>
             </select>
           </div>
           <div>

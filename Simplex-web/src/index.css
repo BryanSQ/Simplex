@@ -1,20 +1,87 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Global styles */
+* {
+  margin: 5px ;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+body {
+  font-family: 'Arial', sans-serif;
 }
 
+/* Header styles */
+html, body{
+  height: 100vh;
+  background-color: #0f0f0f;
+  color:#fff;
+  justify-content: center;
+  align-items: center;
+}
+
+a {
+  text-decoration: none;
+  color: rgb(105, 21, 169);
+}
+
+/* responsive centered container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(255, 255, 255, 0.3);
+  border-radius: 5px;
+}
+
+/* button styles */
+button {
+  background-color: rgb(105, 21, 169);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: rgba(71, 27, 104, 0.8);
+}
+
+input {
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #0f0f0f;
+  color: #fff;
+  border: 1px solid #ccc;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #9500ff;
+  box-shadow: 0 0 5px rgba(158, 30, 255, 0.6);
+}
+
+input::selection
+select:focus-visible {
+  background-color: rgba(158, 30, 255, 0.6);
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .container {
+      padding: 10px;
+  }
+  button {
+      padding: 8px 16px;
+  }
+}
+
+.highlight {
+  box-shadow: 0 0 5px rgba(158, 30, 255, 0.6);
+}
+
+.rojo {
+  color: red;
+}

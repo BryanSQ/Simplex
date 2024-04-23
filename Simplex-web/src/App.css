@@ -10,6 +10,11 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  height: 100vh;
+  background-color: #0f0f0f;
+  color: #fff;
+  justify-content: center;
+  align-items: center;
 }
 
 #main-frame {
@@ -22,10 +27,26 @@ body {
 
 input[type="number"],
 select {
-  width: 100px;
-  height: 25px;
   padding: 10px;
-  margin: 5px 0;
-  border: 1px solid #ccc;
   border-radius: 5px;
+  background-color: #0f0f0f;
+  color: #fff;
+  border: 1px solid #ccc;
+  width: 100%;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+button {
+  background-color: rgb(105, 21, 169);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: rgba(71, 27, 104, 0.8);
 }

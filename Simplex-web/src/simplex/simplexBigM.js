@@ -1,4 +1,4 @@
-import { iteration, findPivotRow, showMatrix, showResults, findPivot, buildRestrictions, getOtherVariablesCount, buildBVS, rowMult, rowAddition, simplexProcess } from "./utils";
+import { rowAddition, simplexProcess } from "./utils";
 const M = 1000000;
 
 const buildBigMZ = (variables, slackCount, artificialCount) => {
@@ -16,23 +16,23 @@ const buildBigMZ = (variables, slackCount, artificialCount) => {
     }
 
     z.push(0);
-    console.log(z);
     return z;
 }
 
 const simplexBigM = (matrix, BVS, header, artificialCount) => {
-    for (let i = matrix[0].length - artificialCount; i < matrix.length; i++) {
+    const end = matrix[0].length - 1;
+    const start = end - artificialCount;
+    for (let i = start; i < end; i++) {
         if (matrix[0][i] == M) {
             for (let j = 0; j < matrix.length; j++) {
                 if (matrix[j][i] == 1) {
-                    matrix = rowAddition(matrix, j, 0, -M);  
+                    matrix = rowAddition(matrix, j, 0, -M);
                 }
             }
         }         
     }
-
-    simplexProcess(matrix, BVS, header);
-    return matrix;
+    const newMatrix = simplexProcess(matrix, BVS, header);
+    return newMatrix;
 }
 
 export { buildBigMZ, simplexBigM };

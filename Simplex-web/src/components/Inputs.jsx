@@ -1,9 +1,8 @@
 import { useDispatch, useSelector } from "react-redux"
 import { setRestrictions, setVariables } from "../reducers/simplexReducer"
-import Simplex from "../simplex"
+import Simplex from "../simplex/simplex"
 
-import '../styles/Variables.css'
-import '../styles/Restrictions.css'
+import '../styles/Inputs.css'
 
 const Inputs = () => {
   const dispatch = useDispatch()
@@ -11,7 +10,7 @@ const Inputs = () => {
   const restricciones = useSelector(state => state.config.restricciones)
   const target = useSelector(state => state.config.target)
 
-  const handleVariablesSubmit = (vars) => {    
+  const handleVariablesSubmit = (vars) => {
     // get data from inputs
     const inputs = vars
 
@@ -63,63 +62,63 @@ const Inputs = () => {
 
     // get restrictions
     const rests = inputs.filter(input => input.id.includes('input-restriccion') || input.id.includes('select') || input.id.includes('input-res'))
-    
+
     handleVariablesSubmit(variables)
     handleRestrictionsSubmit(rests)
   };
 
 
-
   return (
     <div>
       <div>
-        <div id="variables-container">
-          <h2>Variables</h2>
-          <div>
-            <form onSubmit={handleSubmit}>
-              {
-                Array.from({ length: variables }, (_, i) => (
+        <form onSubmit={handleSubmit}>
 
-                  <span key={i}>
+          <div className="container">
+            <h2>Variables: {variables}</h2>
+            <div className="item-container">
+              <div className="flex-container items-row">
+              {                
+                Array.from({ length: variables }, (_, i) => (
+                  <span key={i} className="item">
                     <input id={`input-x${i}`} type="number" />
-                    <label htmlFor={`input-x${i}`}>X{i + 1}</label>
+                    <label htmlFor={`input-x${i}`}>X<sub>{i + 1}</sub></label>
                   </span>
                 ))
               }
-              <br />
-              <div id="restrictions-container">
-                <h2>Restricciones</h2>
-                <div>
-                  {
-                    Array.from({ length: restricciones }, (_, i) => (
-                      <span key={i} className="restriction-row">
-                        {
-                          Array.from({ length: variables }, (_, j) => (
-                            <span key={j} className="restriction-item">
-                              <input id={`input-restriccion-${i}-${j}`} type="number" />
-                              <label htmlFor={`input-restriccion-${i}-${j}`}>X{j + 1}</label>
-                            </span>
-                          ))
-                        }
-                        <select id={`select-${i}`} className="equality">
-                          <option value="<=">{"<="}</option>
-                          <option value=">=">{">="}</option>
-                          <option value="=">{"="}</option>
-                        </select>
-                        <input type="number" id={`input-res${i + 1}`} />
-                      </span>
-                    ))
-                  }
-                </div>
               </div>
-              <div>
-                <button type="submit">Iniciar</button>
-              </div>
-            </form>
+            </div>
           </div>
-        </div>
+
+          <div className="container">
+            <h2>Restricciones: {restricciones}</h2>
+            <div className="item-container">
+              {
+                Array.from({ length: restricciones }, (_, i) => (
+                  <span key={i} className="flex-container items-row">
+                    {
+                      Array.from({ length: variables }, (_, j) => (
+                        <span key={j} className="item">
+                          <input id={`input-restriccion-${i}-${j}`} type="number" />
+                          <label htmlFor={`input-restriccion-${i}-${j}`}>X<sub>{j + 1}</sub></label>
+                        </span>
+                      ))
+                    }
+                    <select id={`select-${i}`} className="equality">
+                      <option value="<=">{"<="}</option>
+                      <option value=">=">{">="}</option>
+                      <option value="=">{"="}</option>
+                    </select>
+                    <input type="number" id={`input-res${i + 1}`} />
+                  </span>
+                ))
+              }
+            </div>
+            <div className="button-container">
+              <button type="submit">Iniciar</button>
+            </div>
+          </div>
+        </form>
       </div>
-      <p>target: {target}</p>
     </div>
   )
 }
