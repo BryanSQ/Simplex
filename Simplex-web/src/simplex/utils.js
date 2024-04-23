@@ -3,17 +3,16 @@ import { setSteps } from '../reducers/tableReducer';
 
 const iteration = (matrix, pivotRow, pivotCol, pivotValue) =>{
     if (pivotValue != 1){
-        console.log('row operation', `1/${pivotValue}f${pivotRow} => f${pivotRow}`);
+        // console.log('row operation', `1/${pivotValue}f${pivotRow} => f${pivotRow}`);
         matrix = rowMult(matrix, pivotRow, 1/pivotValue);
-        console.table(matrix);
+        // console.table(matrix);
     }
     
     for (let i = 0; i < matrix.length; i++) {
-        if (i !== pivotRow && matrix[i][pivotCol] !== 0) {
-            console.log({i,pivotCol, pivotRow});
-            console.log('row operation', `${-matrix[i][pivotCol]}f${pivotCol} + f${i} => f${i}`);
+        if (i !== pivotRow && matrix[i][pivotCol] !== 0) {            
+            // console.log('row operation', `${-matrix[i][pivotCol]}f${pivotCol} + f${i} => f${i}`);
             matrix = rowAddition(matrix, pivotRow, i, -matrix[i][pivotCol]);
-            console.table(matrix);
+            // console.table(matrix);
         }      
     }
     return matrix;
@@ -184,7 +183,6 @@ const simplexProcess = (matrix, BVS, header) => {
         }
         BVS[pivotRow.index] = header[pivot];
         const pivotValue = matrix[pivotRow.index][pivot];
-        console.log('inicio de iteracion', {pivotRow, pivot, pivotValue});
         matrix = iteration(matrix, pivotRow.index, pivot, pivotValue);
         const step = matrix.map((row, i) => [i, BVS[i], ...row]);
         Store.dispatch(setSteps(step));
