@@ -52,8 +52,8 @@ const Simplex = () => {
     console.log(arrays.BVS);
     console.log(arrays.header);
 
-    showMatrix(processedMatrix, arrays.BVS, arrays.header);
-    showResults(processedMatrix, arrays.BVS);
+    showMatrix(processedMatrix.matrix, arrays.BVS, arrays.header);
+    showResults(processedMatrix.matrix, arrays.BVS);
 }
 
 
