@@ -25,6 +25,21 @@ const buildTwoPhaseZ = (variables, slackCount, artificialCount, target) => {
     
 }
 
+const buildTwoPhaseBVS = (variables, { slackCount, artificialCount }) => {
+    let start = variables + 1;
+    const bvs = []
+
+    for (let i = 0; i < slackCount; i++) {
+        bvs.push(`s${start}`)
+        start++;
+    }
+    for (let i = 0; i < artificialCount; i++) {
+        bvs.push(`a${start}`)
+        start++;
+    }
+    return ['-w', 'z', ...bvs];
+}
+
 const simplexTwoPhases = (matrix, BVS, header, artificialCount) => {
     const end = matrix[0].length - 1;
     const start = end - artificialCount;
@@ -38,13 +53,13 @@ const simplexTwoPhases = (matrix, BVS, header, artificialCount) => {
         }         
     }
 
-    console.table(matrix);
     const phaseOne = simplexProcessPhaseOne(matrix, BVS, header);
     const matrixPhaseOne = phaseOne.matrix;
     const BVSPhaseOne = phaseOne.BVS;
     const headerPhaseOne = phaseOne.header;
 
-    console.log(matrixPhaseOne[0]);
+    console.log('BVS', BVSPhaseOne);
+
     for(let i = 0; i < matrixPhaseOne[0].length; i++) {
         if (matrixPhaseOne[0][i] > 0 && matrixPhaseOne[0][matrixPhaseOne[0].length - 1] != 0) {
             alert('The problem is infeasible');
@@ -52,13 +67,13 @@ const simplexTwoPhases = (matrix, BVS, header, artificialCount) => {
         }
     }
     
-    const { preparedMatrix, preparedHeader } = phaseTwoPreparation(matrixPhaseOne, headerPhaseOne, artificialCount);
-    const matrixPhaseTwo = simplexProcess(preparedMatrix, BVSPhaseOne, preparedHeader);
-   
+    const { preparedMatrix, preparedBVS, preparedHeader } = phaseTwoPreparation(matrixPhaseOne, BVSPhaseOne, headerPhaseOne, artificialCount);
+    const matrixPhaseTwo = simplexProcess(preparedMatrix, preparedBVS, preparedHeader);
+    
     return matrixPhaseTwo;
 }
 
-const phaseTwoPreparation = (matrix, header, artificialCount) =>{
+const phaseTwoPreparation = (matrix, BVS, header, artificialCount) =>{
     let preparedMatrix = matrix.slice(1);
     const end = preparedMatrix[0].length - 1;
     const start = end - artificialCount;
@@ -66,7 +81,8 @@ const phaseTwoPreparation = (matrix, header, artificialCount) =>{
         preparedMatrix = removeColumn(preparedMatrix, i);
         header.splice(i, 1)
     }
-    return { preparedMatrix, preparedHeader: header };
+    BVS.splice(0, 1);
+    return { preparedMatrix, preparedBVS: BVS, preparedHeader: header };
 }
 
 const simplexProcessPhaseOne = (matrix, BVS, header) => {
@@ -82,23 +98,23 @@ const simplexProcessPhaseOne = (matrix, BVS, header) => {
         const pivotValue = matrix[pivotRow.index][pivot];        
         matrix = iteration(matrix, pivotRow.index, pivot, pivotValue);
         const step = matrix.map((row, i) => [i, BVS[i], ...row]);
-        Store.dispatch(setSteps(step));
+        Store.dispatch(setSteps(step));       
     }
     
     return { matrix,  BVS, header };
 }
 
 const findPivotRow = (matrix, pivot) => {
-    const ratios = matrix.slice(2).map((row, key) => {
+    const ratios = matrix.slice(2).map((row, key) => { // 
         const value = row[row.length - 1];
         const pivotValue = row[pivot];
 
         if (pivotValue <= 0) {
-            return {index: key+1, value: Infinity}
+            return {index: key+2, value: Infinity}
         }
-        return {index: key+1, value: value/pivotValue}
+        return {index: key+2, value: value/pivotValue}
     })
-
+  
     if (ratios.every(ratio => ratio.value === Infinity)) {
         return -1;
     }
@@ -110,4 +126,4 @@ const findPivotRow = (matrix, pivot) => {
     return pivotRow;
 }
 
-export { buildTwoPhaseZ, simplexTwoPhases };
+export { buildTwoPhaseZ, simplexTwoPhases, buildTwoPhaseBVS };

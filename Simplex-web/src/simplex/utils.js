@@ -1,5 +1,6 @@
 import Store from "../store";
 import { setSteps } from '../reducers/tableReducer';
+import { buildTwoPhaseBVS } from "./simplexTwoPhases";
 
 const iteration = (matrix, pivotRow, pivotCol, pivotValue) =>{
     if (pivotValue != 1){
@@ -135,8 +136,12 @@ const buildRestrictions = (restrictions) => {
         row.push(...slack);
         row.push(...artificial);
         row.push(Number(restriction.res));
-        restrictionMatrix.push(row);                
+        restrictionMatrix.push(row);
+        
+        
     }
+    console.log('Restriction matrix');
+    console.table(restrictionMatrix);
     return restrictionMatrix;
 }
 
@@ -194,21 +199,27 @@ const simplexProcess = (matrix, BVS, header) => {
 const buildMatrix = (variables, restrictions, Z) => {
     const matrix = [];
     const { slackCount, artificialCount } = getOtherVariablesCount(restrictions);
-    const BVS = buildBVS(variables.length, { slackCount, artificialCount });
+    let BVS = []
+    let header = []
+    header.push(...variables.map((variable) => Object.keys(variable)[0]));
     
     if (Array.isArray(Z[0])){
         matrix.push(Z[0]);
         matrix.push(Z[1]);
+        BVS = buildTwoPhaseBVS(variables.length, { slackCount, artificialCount });
+        header.push(...BVS.slice(2));
     } else{
         matrix.push(Z);
+        BVS = buildBVS(variables.length, { slackCount, artificialCount });
+        header.push(...BVS.slice(1));
     }
     
     const restrictionMatrix = buildRestrictions(restrictions);
     matrix.push(...restrictionMatrix);
 
-    const header = []
-    header.push(...variables.map((variable) => Object.keys(variable)[0]));
-    header.push(...BVS.slice(1));
+    
+   
+    
 
     return {matrix, BVS, header};
 }
