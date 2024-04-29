@@ -74,16 +74,26 @@ const showResults = (matrix, BVS) => {
     console.log(results);
 }
 
-const buildBVS = (variables, { slackCount, artificialCount }) => {
-    let start = variables + 1;
-    const bvs = []
+const slackOrArtificial = (row) => {
+    // if the row constains 1 and the rest are 0, it is a slack variable
+    // if the row contains a -1 and a 1, it is a artificial variable
+    const slack = row.filter(value => value === 1)
+        .length === 1 && row.filter(value => value === 0)
+        .length === row.length - 1;
+    const artificial = row.filter(value => value === -1)
+        .length === 1 && row.filter(value => value === 1)
+        .length === 1 && row.filter(value => value === 0)
+        .length === row.length - 2;
+    return slack ? 's' : artificial ? 'a' : '';
+}
 
-    for (let i = 0; i < slackCount; i++) {
-        bvs.push(`s${start}`)
-        start++;
-    }
-    for (let i = 0; i < artificialCount; i++) {
-        bvs.push(`a${start}`)
+const buildBVS = (matrix, start) => {
+    const submatrix = matrix.map(row => row.slice(start, matrix[0].length - 1));
+    const bvs = []
+    start++;
+    for (let row of submatrix) {
+        const type = slackOrArtificial(row);
+        bvs.push(`${type}${start}`);
         start++;
     }
     return ['z', ...bvs];
@@ -196,12 +206,27 @@ const simplexProcess = (matrix, BVS, header) => {
     return { matrix, BVS, header };
 }
 
+const buildHeader = (variables, slackCount, artificialCount) => {
+    let header = []
+    header.push(...variables.map((variable) => Object.keys(variable)[0]));
+    let start = variables.length + 1;
+    for (let i = 0; i < slackCount; i++) {
+        header.push(`s${start}`);
+        start++;
+    }
+    for (let i = 0; i < artificialCount; i++) {
+        header.push(`a${start}`);
+        start++;
+    }
+    return header;
+}
+
 const buildMatrix = (variables, restrictions, Z) => {
     const matrix = [];
     const { slackCount, artificialCount } = getOtherVariablesCount(restrictions);
     let BVS = []
     let header = []
-    header.push(...variables.map((variable) => Object.keys(variable)[0]));
+    
     
     if (Array.isArray(Z[0])){
         matrix.push(Z[0]);
@@ -210,11 +235,14 @@ const buildMatrix = (variables, restrictions, Z) => {
         header.push(...BVS.slice(2));
     } else{
         matrix.push(Z);
-        BVS = buildBVS(variables.length, { slackCount, artificialCount });
-        header.push(...BVS.slice(1));
+        //BVS = buildBVS(matrix, variables.length, { slackCount, artificialCount });
+        //header.push(...BVS.slice(1));
     }
     
     const restrictionMatrix = buildRestrictions(restrictions);
+    BVS = buildBVS(restrictionMatrix, variables.length, { slackCount, artificialCount });
+    header = buildHeader(variables, slackCount, artificialCount);
+    console.table(restrictionMatrix);
     matrix.push(...restrictionMatrix);
 
     

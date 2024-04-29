@@ -40,7 +40,6 @@ const Simplex = () => {
         console.log('Invalid method');
     }
     
-    
     if (target === 'min'){
         processedMatrix[0][processedMatrix.length - 1] = processedMatrix[0][processedMatrix.length - 1] * -1;
     }
