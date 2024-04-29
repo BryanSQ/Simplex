@@ -8,7 +8,6 @@ const Inputs = () => {
   const dispatch = useDispatch()
   const variables = useSelector(state => state.config.variables)
   const restricciones = useSelector(state => state.config.restricciones)
-  const target = useSelector(state => state.config.target)
 
   const handleVariablesSubmit = (vars) => {
     // get data from inputs
@@ -74,7 +73,7 @@ const Inputs = () => {
         <form onSubmit={handleSubmit}>
 
           <div className="container">
-            <h2>Variables: {variables}</h2>
+            <h2>Variables: {variables}</h2>            
             <div className="item-container">
               <div className="flex-container items-row">
               {                

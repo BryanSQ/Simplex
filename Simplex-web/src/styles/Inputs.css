@@ -18,15 +18,19 @@
   margin-right: 5px;
 }
 
-.item-container input[type="number"] {
-  width: 75px;
-  height: 25px;
-  padding: 10px;
-  margin: 5px 0;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  text-align: center;
+.item-container input[type="number"]::-webkit-outer-spin-button,
+.item-container input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+     
 }
+
+.item-container input[type="number"] {
+    -moz-appearance: textfield;
+    width: 75px;
+    height: 30px; 
+}
+
 
 .item-container button {
   width: 200px;

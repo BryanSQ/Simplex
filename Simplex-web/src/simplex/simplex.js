@@ -33,7 +33,7 @@ const Simplex = () => {
     }
     else if (method === 'two-phase') {
         Z = buildTwoPhaseZ(variables, slackCount, artificialCount, target);
-        arrays = buildMatrix(variables, restrictions, target, Z);
+        arrays = buildMatrix(variables, restrictions, Z);
         processedMatrix = simplexTwoPhases(arrays.matrix, arrays.BVS, arrays.header, artificialCount);
     }
     else {
@@ -46,11 +46,6 @@ const Simplex = () => {
     }
     
     Store.dispatch(setHeader(arrays.header));
-
-    console.log('Processed matrix');
-    console.table(processedMatrix);
-    console.log(arrays.BVS);
-    console.log(arrays.header);
 
     showMatrix(processedMatrix.matrix, arrays.BVS, arrays.header);
     showResults(processedMatrix.matrix, arrays.BVS);

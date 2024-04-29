@@ -12,20 +12,20 @@ const Table = () => {
     const [data, setData] = useState([])
 
     const header = useSelector((state) => state.table.header)
-    const fullHeader = ['i','BVS',...header, "RHS"] 
+    const fullHeader = ['i', 'BVS', ...header, "RHS"]
     let steps = useSelector((state) => state.table.steps)
 
     useEffect(() => {
-        if (steps.length > 0){
+        if (steps.length > 0) {
             setShowTable(true)
             setData(steps)
-        }        
+        }
     }, [steps])
 
 
     const nextStep = () => {
         if (currentStep < steps.length - 1) {
-            setCurrentStep(currentStep + 1)            
+            setCurrentStep(currentStep + 1)
         }
     }
 
@@ -49,37 +49,37 @@ const Table = () => {
     return (
         <div>
             <table>
-            <thead>
-                <tr>
-                    {fullHeader.map((item, key) => (
-                        <th key={key}>{item}</th>
-                    ))}
-                </tr>
-            </thead>
-            <tbody>
-                {data[currentStep].map((row, key) => (
-                    <tr key={key}>
-                        {row.map((item, key) => (
-                            <td key={key}>{item}</td>
+                <thead>
+                    <tr>
+                        {fullHeader.map((item, key) => (
+                            <th key={key}>{item}</th>
                         ))}
                     </tr>
-                ))}
-            </tbody>
-        </table>
-            <div style={{display: "flex", justifyContent:"space-between"}}>
-            <button onClick={prevStep}>
-                Anterior
-            </button>
-            <button onClick={nextStep}>
-                Siguiente
-            </button>
-            <div>
-                <p>Paso {currentStep + 1} de {steps.length}</p>
+                </thead>
+                <tbody>
+                    {data[currentStep].map((row, key) => (
+                        <tr key={key}>
+                            {row.map((item, key) => (
+                                <td key={key}>{item}</td>
+                            ))}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <button onClick={prevStep}>
+                    Anterior
+                </button>
+                <button onClick={nextStep}>
+                    Siguiente
+                </button>
+                <div>
+                    <p>Paso {currentStep + 1} de {steps.length}</p>
+                </div>
+                <button onClick={reset}>
+                    Reiniciar
+                </button>
             </div>
-            <button onClick={reset}>
-                Reiniciar
-            </button>
-        </div>
         </div>
     )
 }

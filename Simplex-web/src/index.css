@@ -3,6 +3,7 @@
   margin: 5px ;
   padding: 0;
   box-sizing: border-box;
+  color-scheme: dark light;
 }
 
 body {
@@ -47,7 +48,8 @@ button:hover {
   background-color: rgba(71, 27, 104, 0.8);
 }
 
-input {
+input,
+select {
   padding: 10px;
   border-radius: 5px;
   background-color: #0f0f0f;
@@ -55,6 +57,7 @@ input {
   border: 1px solid #ccc;
   width: 100%;
   margin-bottom: 10px;
+  text-align: center;
 }
 
 input:focus {
@@ -80,8 +83,4 @@ select:focus-visible {
 
 .highlight {
   box-shadow: 0 0 5px rgba(158, 30, 255, 0.6);
-}
-
-.rojo {
-  color: red;
 }

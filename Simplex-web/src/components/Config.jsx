@@ -11,7 +11,6 @@ const Config = () => {
 
     const dispatch = useDispatch()
 
-
     const handleVariables = (e) => {
       dispatch(setVariables(e.target.value))
     }
@@ -32,7 +31,7 @@ const Config = () => {
 
     return (
       <section className='container'>
-        <h2>Config</h2>
+        <h2>Configuración</h2>
         <form>
           <div>
             <label htmlFor="select-Target">Objetivo:</label>
@@ -55,9 +54,8 @@ const Config = () => {
           </div>
           <div>
             <label htmlFor="input-restricciones">Restricciones:</label>
-            <input id="input-restricciones" type="number" min="1" onChange={handleRestricciones} />
+            <input id="input-restricciones" type="number" min="1" onChange={handleRestricciones} />            
           </div>
-
         </form>
       </section>
     )

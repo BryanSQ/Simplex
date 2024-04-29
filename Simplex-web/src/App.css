@@ -1,52 +1,7 @@
-* {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-  color-scheme: dark light;
-}
-
-body {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: #0f0f0f;
-  color: #fff;
-  justify-content: center;
-  align-items: center;
-}
-
 #main-frame {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 20px;
-}
-
-input[type="number"],
-select {
-  padding: 10px;
-  border-radius: 5px;
-  background-color: #0f0f0f;
-  color: #fff;
-  border: 1px solid #ccc;
-  width: 100%;
-  margin-bottom: 10px;
-  text-align: center;
-}
-
-button {
-  background-color: rgb(105, 21, 169);
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  padding: 10px 20px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-button:hover {
-  background-color: rgba(71, 27, 104, 0.8);
 }

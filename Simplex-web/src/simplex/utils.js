@@ -188,7 +188,7 @@ const simplexProcess = (matrix, BVS, header) => {
     }
     
 
-    return { matrix,  BVS, header };
+    return { matrix, BVS, header };
 }
 
 const buildMatrix = (variables, restrictions, Z) => {

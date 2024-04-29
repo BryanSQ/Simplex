@@ -24,14 +24,14 @@ const simplexBigM = (matrix, BVS, header, artificialCount) => {
     const start = end - artificialCount;
     for (let i = start; i < end; i++) {
         if (matrix[0][i] == M) {
-            for (let j = 0; j < matrix.length; j++) {
+            for (let j = 1; j < matrix.length; j++) {
                 if (matrix[j][i] == 1) {
                     matrix = rowAddition(matrix, j, 0, -M);
                 }
             }
         }         
     }
-    const newMatrix = simplexProcess(matrix, BVS, header).matrix;
+    const newMatrix = simplexProcess(matrix, BVS, header);
     return newMatrix;
 }
 
