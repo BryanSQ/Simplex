@@ -1,10 +1,10 @@
-import { buildZ, rowAddition, simplexProcess, removeColumn, findPivot, iteration } from "./utils";
+import { rowAddition, simplexProcess, removeColumn, findPivot, iteration } from "./utils";
 import { setSteps } from '../reducers/tableReducer';
 import Store from "../store";
 
-const buildTwoPhaseZ = (variables, slackCount, artificialCount, target) => {
+const buildW = (variables, counts) => {
+    const { slackCount, artificialCount } = counts;
     const total = variables.length + slackCount + artificialCount;
-    const begin = []
     let w = []
     for (let i = 0; i < total; i++) {
        if (i < (variables.length + slackCount)) {
@@ -15,30 +15,9 @@ const buildTwoPhaseZ = (variables, slackCount, artificialCount, target) => {
     }
 
     w.push(0);
-
-    const z = buildZ(variables, (slackCount + artificialCount + 1), target);
-    
-    begin.push(w);
-    begin.push(z);
-
-    return begin;
-    
+    return w;    
 }
 
-const buildTwoPhaseBVS = (variables, { slackCount, artificialCount }) => {
-    let start = variables + 1;
-    const bvs = []
-
-    for (let i = 0; i < slackCount; i++) {
-        bvs.push(`s${start}`)
-        start++;
-    }
-    for (let i = 0; i < artificialCount; i++) {
-        bvs.push(`a${start}`)
-        start++;
-    }
-    return ['-w', 'z', ...bvs];
-}
 
 const simplexTwoPhases = (matrix, BVS, header, artificialCount) => {
     const end = matrix[0].length - 1;
@@ -57,8 +36,6 @@ const simplexTwoPhases = (matrix, BVS, header, artificialCount) => {
     const matrixPhaseOne = phaseOne.matrix;
     const BVSPhaseOne = phaseOne.BVS;
     const headerPhaseOne = phaseOne.header;
-
-    console.log('BVS', BVSPhaseOne);
 
     for(let i = 0; i < matrixPhaseOne[0].length; i++) {
         if (matrixPhaseOne[0][i] > 0 && matrixPhaseOne[0][matrixPhaseOne[0].length - 1] != 0) {
@@ -126,4 +103,4 @@ const findPivotRow = (matrix, pivot) => {
     return pivotRow;
 }
 
-export { buildTwoPhaseZ, simplexTwoPhases, buildTwoPhaseBVS };
+export { simplexTwoPhases, buildW };

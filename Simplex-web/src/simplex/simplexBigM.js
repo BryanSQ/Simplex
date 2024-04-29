@@ -1,23 +1,6 @@
 import { rowAddition, simplexProcess } from "./utils";
 const M = 1000000;
 
-const buildBigMZ = (variables, slackCount, artificialCount) => {
-    const z = variables.map((variable) => {
-        const v = Number(variable[Object.keys(variable)[0]])
-        return v * -1
-    })
-
-    for (let i = 0; i < slackCount; i++) {
-        z.push(0);
-    }
-
-    for (let i = 0; i < artificialCount; i++) {
-        z.push(M);
-    }
-
-    z.push(0);
-    return z;
-}
 
 const simplexBigM = (matrix, BVS, header, artificialCount) => {
     const end = matrix[0].length - 1;
@@ -35,4 +18,4 @@ const simplexBigM = (matrix, BVS, header, artificialCount) => {
     return newMatrix;
 }
 
-export { buildBigMZ, simplexBigM };
+export { simplexBigM };

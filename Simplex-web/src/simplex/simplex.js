@@ -1,8 +1,11 @@
 import Store from "../store";
 import { resetTable, setHeader } from '../reducers/tableReducer';
-import { showMatrix, showResults, buildZ, simplexProcess, buildMatrix, getOtherVariablesCount } from "./utils";
-import { buildBigMZ, simplexBigM } from "./simplexBigM";
-import { buildTwoPhaseZ, simplexTwoPhases } from "./simplexTwoPhases";
+import { buildW, simplexTwoPhases } from "./simplexTwoPhases";
+import { simplexBigM } from "./simplexBigM";
+import { 
+    showMatrix, showResults, buildZ, simplexProcess,
+    getOtherVariablesCount, buildHeader, buildBVS, buildRestrictions 
+} from "./utils";
 
 const Simplex = () => {
     // access the simplex reducer
@@ -10,44 +13,37 @@ const Simplex = () => {
     const {variables, restrictions } = Store.getState().simplex;
     const {target, method} = Store.getState().config;
 
-    const {slackCount, artificialCount} = getOtherVariablesCount(restrictions);
+    const counts = getOtherVariablesCount(restrictions);
     
-    let processedMatrix = [];
-    let Z = []
-    
-    let arrays = {
-        matrix: [],
-        BVS: [],
-        header: []
-    }
+    let simplexResults = {};
+    const header = buildHeader(variables, counts);
+    const Z = buildZ(variables, counts, target, method);
+    const restrictionMatrix = buildRestrictions(restrictions);
+    const BVS = buildBVS(header, restrictionMatrix, variables.length, method);
+    const matrix = [Z, ...restrictionMatrix];
 
     if (method === 'simplex') {
-        Z = buildZ(variables, (slackCount + artificialCount + 1), target);
-        arrays = buildMatrix(variables, restrictions, Z);
-        processedMatrix= simplexProcess(arrays.matrix, arrays.BVS, arrays.header);        
+        simplexResults = simplexProcess(matrix, BVS, header);        
     }
     else if (method === 'big-m') {
-        Z = buildBigMZ(variables, slackCount, artificialCount);
-        arrays = buildMatrix(variables, restrictions, Z);
-        processedMatrix = simplexBigM(arrays.matrix, arrays.BVS, arrays.header, artificialCount);
+        simplexResults = simplexBigM(matrix, BVS, header, counts.artificialCount);
     }
     else if (method === 'two-phase') {
-        Z = buildTwoPhaseZ(variables, slackCount, artificialCount, target);
-        arrays = buildMatrix(variables, restrictions, Z);
-        processedMatrix = simplexTwoPhases(arrays.matrix, arrays.BVS, arrays.header, artificialCount);
+        const matrixW = [buildW(variables, counts), ...matrix];        
+        simplexResults = simplexTwoPhases(matrixW, BVS, header, counts.artificialCount);
     }
     else {
         console.log('Invalid method');
     }
     
     if (target === 'min'){
-        processedMatrix[0][processedMatrix.length - 1] = processedMatrix[0][processedMatrix.length - 1] * -1;
+        const length = simplexResults.matrix[0].length;
+        simplexResults.matrix[0][length - 1] = simplexResults.matrix[0][length - 1] * -1;
     }
     
-    Store.dispatch(setHeader(arrays.header));
-
-    showMatrix(processedMatrix.matrix, arrays.BVS, arrays.header);
-    showResults(processedMatrix.matrix, arrays.BVS);
+    Store.dispatch(setHeader(header));
+    showMatrix(simplexResults.matrix, simplexResults.BVS, header);
+    showResults(simplexResults.matrix, simplexResults.BVS);
 }
 
 

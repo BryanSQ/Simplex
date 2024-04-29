@@ -1,6 +1,5 @@
 import Store from "../store";
 import { setSteps } from '../reducers/tableReducer';
-import { buildTwoPhaseBVS } from "./simplexTwoPhases";
 
 const iteration = (matrix, pivotRow, pivotCol, pivotValue) =>{
     if (pivotValue != 1){
@@ -77,26 +76,30 @@ const showResults = (matrix, BVS) => {
 const slackOrArtificial = (row) => {
     // if the row constains 1 and the rest are 0, it is a slack variable
     // if the row contains a -1 and a 1, it is a artificial variable
-    const slack = row.filter(value => value === 1)
-        .length === 1 && row.filter(value => value === 0)
-        .length === row.length - 1;
-    const artificial = row.filter(value => value === -1)
-        .length === 1 && row.filter(value => value === 1)
-        .length === 1 && row.filter(value => value === 0)
-        .length === row.length - 2;
-    return slack ? 's' : artificial ? 'a' : '';
+    const one = row.indexOf(1);
+    const minusOne = row.indexOf(-1);
+    if (one !== -1 && minusOne === -1) {
+        return one;
+    }
+    if (one !== -1 && minusOne !== -1) {
+        return one;
+    }
 }
 
-const buildBVS = (matrix, start) => {
+const buildBVS = (header, matrix, start, method) => {
+    const subheader = header.slice(start, header.length);
     const submatrix = matrix.map(row => row.slice(start, matrix[0].length - 1));
-    const bvs = []
+    const vars = []
     start++;
     for (let row of submatrix) {
-        const type = slackOrArtificial(row);
-        bvs.push(`${type}${start}`);
+        const position = slackOrArtificial(row);
+        vars.push(`${subheader[position]}`);
         start++;
     }
-    return ['z', ...bvs];
+    if (method === 'two-phase') {
+        return ['-w', 'z', ...vars];
+    }
+    return ['z', ...vars];
 }
 
 const findPivot = (z) => {
@@ -150,8 +153,6 @@ const buildRestrictions = (restrictions) => {
         
         
     }
-    console.log('Restriction matrix');
-    console.table(restrictionMatrix);
     return restrictionMatrix;
 }
 
@@ -165,24 +166,28 @@ const getOtherVariablesCount = (restrictions) => {
     }
 }
 
-const buildZ = (variables, rows, target) =>{
-    let z = []
-    if (target === 'max') {
-        z = variables.map((variable) => {
-            const v = Number(variable[Object.keys(variable)[0]])
-            return v * -1
-        })
-    } else {
-        z = variables.map((variable) => {
-            const v = Number(variable[Object.keys(variable)[0]])
-            return v
-        })
+const buildZ = (variables, counts, target, method) =>{
+    const { slackCount, artificialCount } = counts;
+    const total = slackCount + artificialCount + 1;
+    let vars = []
+
+    const methodConstant = {
+        'simplex': 0,
+        'big-m': 1000000,
+        'two-phase': 1
     }
-    
-    for (let zeros = 0; zeros < rows; zeros++) {
-        z.push(0);
-    } 
-       
+
+    vars = variables.map((variable) => {
+        const v = Number(variable[Object.keys(variable)[0]])
+        return target === 'max' ? v * -1 : v;
+    })
+        
+    let zFill = new Array(total).fill(0);
+    for (let i = slackCount; i < total - 1; i++) {
+        zFill[i] = methodConstant[method];
+    }
+
+    const z = vars.concat(zFill);
     return z;
 }
 
@@ -203,10 +208,11 @@ const simplexProcess = (matrix, BVS, header) => {
     }
     
 
-    return { matrix, BVS, header };
+    return { matrix, BVS };
 }
 
-const buildHeader = (variables, slackCount, artificialCount) => {
+const buildHeader = (variables, counts) => {
+    const { slackCount, artificialCount } = counts;
     let header = []
     header.push(...variables.map((variable) => Object.keys(variable)[0]));
     let start = variables.length + 1;
@@ -221,35 +227,13 @@ const buildHeader = (variables, slackCount, artificialCount) => {
     return header;
 }
 
-const buildMatrix = (variables, restrictions, Z) => {
+const buildMatrix = (Z, restrictions) => {
     const matrix = [];
-    const { slackCount, artificialCount } = getOtherVariablesCount(restrictions);
-    let BVS = []
-    let header = []
-    
-    
-    if (Array.isArray(Z[0])){
-        matrix.push(Z[0]);
-        matrix.push(Z[1]);
-        BVS = buildTwoPhaseBVS(variables.length, { slackCount, artificialCount });
-        header.push(...BVS.slice(2));
-    } else{
-        matrix.push(Z);
-        //BVS = buildBVS(matrix, variables.length, { slackCount, artificialCount });
-        //header.push(...BVS.slice(1));
-    }
-    
-    const restrictionMatrix = buildRestrictions(restrictions);
-    BVS = buildBVS(restrictionMatrix, variables.length, { slackCount, artificialCount });
-    header = buildHeader(variables, slackCount, artificialCount);
+    matrix.push(Z);
+    const restrictionMatrix = buildRestrictions(restrictions);    
     console.table(restrictionMatrix);
     matrix.push(...restrictionMatrix);
-
-    
-   
-    
-
-    return {matrix, BVS, header};
+    return matrix;
 }
 
 function removeColumn(matrix, column) {
@@ -259,4 +243,10 @@ function removeColumn(matrix, column) {
 }
 
 
-export { iteration, findPivotRow, showMatrix, showResults, buildBVS, findPivot, buildRestrictions, getOtherVariablesCount, buildZ, rowMult, rowAddition, simplexProcess, buildMatrix, removeColumn };
+export { 
+    iteration, findPivotRow, showMatrix, 
+    showResults, buildBVS, findPivot, 
+    buildRestrictions, getOtherVariablesCount, 
+    buildZ, rowMult, rowAddition, 
+    simplexProcess, buildMatrix, removeColumn, buildHeader
+};
