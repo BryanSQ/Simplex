@@ -5,13 +5,6 @@ import '../styles/Notification.css'
 const Notification = () => {
   const notification = useSelector(state => state.notification.message)
 
-  const style = {
-    position: 'fixed',
-    border: 'solid',
-    padding: 10,
-    borderWidth: 1
-  }
-
   if (notification === null) {
     return null
   }

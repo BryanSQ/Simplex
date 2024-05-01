@@ -27,7 +27,7 @@ const simplexTwoPhases = (matrix, BVS, header, artificialCount) => {
         if (matrix[0][i] == 1) {
             for (let j = 1; j < matrix.length; j++) {
                 if (matrix[j][i] == 1) {
-                    matrix = rowAddition(matrix, j, 0, -matrix[j][i]);
+                    matrix = rowAddition(matrix, j, 0, -1);
                 }
             }
         }         
@@ -37,7 +37,7 @@ const simplexTwoPhases = (matrix, BVS, header, artificialCount) => {
     const matrixPhaseOne = phaseOne.matrix;
     const BVSPhaseOne = phaseOne.BVS;
     const headerPhaseOne = phaseOne.header;
-
+  
     for(let i = 0; i < matrixPhaseOne[0].length; i++) {
         if (matrixPhaseOne[0][i] > 0 && matrixPhaseOne[0][matrixPhaseOne[0].length - 1] != 0) {            
             Store.dispatch(setNotification('Sin solución factible', 5000));
@@ -67,7 +67,7 @@ const simplexProcessPhaseOne = (matrix, BVS, header) => {
     Store.dispatch(setSteps(matrix.map((row, i) => [i, BVS[i], ...row])));    
     while (matrix[0].slice(0, matrix[0].length-1).some(value => value < 0)) {
         const pivot = findPivot(matrix[0]);
-        const pivotRow = findPivotRow(matrix, pivot);
+        const { pivotRow, ratios } = findPivotRow(matrix, pivot);
         if (pivotRow === -1) {
             alert('No solution');
             break;
@@ -75,7 +75,9 @@ const simplexProcessPhaseOne = (matrix, BVS, header) => {
         BVS[pivotRow.index] = header[pivot];
         const pivotValue = matrix[pivotRow.index][pivot];        
         matrix = iteration(matrix, pivotRow.index, pivot, pivotValue);
-        const step = matrix.map((row, i) => [i, BVS[i], ...row]);
+        const r = ['N/A', 'N/A', ...ratios.map(ratio => ratio.value)];
+        const step = matrix.map((row, i) => [i, BVS[i], ...row, r[i]]);
+      
         Store.dispatch(setSteps(step));       
     }
     
@@ -101,7 +103,7 @@ const findPivotRow = (matrix, pivot) => {
         return prev.value < current.value ? prev : current;
     })
     
-    return pivotRow;
+    return { pivotRow, ratios };
 }
 
 export { simplexTwoPhases, buildW };

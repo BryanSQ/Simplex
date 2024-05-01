@@ -140,7 +140,10 @@ const Inputs = () => {
                   Array.from({ length: variables }, (_, i) => (
                     <span key={i} className="item">
                       <input id={`input-x${i}`} type="number" />
-                      <label htmlFor={`input-x${i}`}>X<sub>{i + 1}</sub></label>
+                      <label htmlFor={`input-x${i}`}>
+                        X<sub>{i + 1}</sub>
+                      </label>
+                      {i < variables - 1 ? ' +' : ''}
                     </span>
                   ))
                 }
@@ -158,7 +161,10 @@ const Inputs = () => {
                       Array.from({ length: variables }, (_, j) => (
                         <span key={j} className="item">
                           <input id={`input-restriccion-${i}-${j}`} type="number" />
-                          <label htmlFor={`input-restriccion-${i}-${j}`}>X<sub>{j + 1}</sub></label>
+                          <label htmlFor={`input-restriccion-${i}-${j}`}>
+                            X<sub>{j + 1}</sub>
+                          </label>
+                          {j < variables - 1 ? ' +' : ''}
                         </span>
                       ))
                     }

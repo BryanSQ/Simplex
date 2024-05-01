@@ -59,9 +59,9 @@
   gap: 2px;
 }
 
-.item::after {
+/*.item::after {
   content: "+";
-}
+}*/
 
 .item::after:last-child {
   content: "";

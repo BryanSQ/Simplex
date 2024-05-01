@@ -12,7 +12,7 @@ const tableSlice = createSlice({
     initialState,
     reducers: {
         setHeader(state, action) {
-            state.header = action.payload
+            state.header.push(...action.payload)
         },
         setBVS(state, action) {
             state.BVS = action.payload

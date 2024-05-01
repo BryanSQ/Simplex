@@ -1,5 +1,5 @@
 import Store from "../store";
-import { setSteps } from '../reducers/tableReducer';
+import { setSteps, setHeader } from '../reducers/tableReducer';
 import { setNotification } from "../reducers/notificationReducer";
 
 const iteration = (matrix, pivotRow, pivotCol, pivotValue) =>{
@@ -15,6 +15,7 @@ const iteration = (matrix, pivotRow, pivotCol, pivotValue) =>{
             matrix = rowAddition(matrix, pivotRow, i, -matrix[i][pivotCol]);
         }      
     }
+
     return matrix;
 }
 
@@ -57,7 +58,7 @@ const findPivotRow = (matrix, pivot) => {
         return prev.value < current.value ? prev : current;
     })
     
-    return pivotRow;
+    return { pivotRow, ratios };
 }
 
 const showMatrix = (matrix, BVS, header) => {
@@ -175,7 +176,7 @@ const buildZ = (variables, counts, target, method) =>{
     const methodConstant = {
         'simplex': 0,
         'big-m': 1000000,
-        'two-phase': 1
+        'two-phase': 0
     }
 
     vars = variables.map((variable) => {
@@ -196,7 +197,7 @@ const simplexProcess = (matrix, BVS, header) => {
     Store.dispatch(setSteps(matrix.map((row, i) => [i, BVS[i], ...row])));
     while (matrix[0].slice(0, matrix[0].length-1).some(value => value < 0)) {
         const pivot = findPivot(matrix[0]);
-        const pivotRow = findPivotRow(matrix, pivot);
+        const { pivotRow, ratios } = findPivotRow(matrix, pivot);
         if (pivotRow === -1) {
             Store.dispatch(setNotification('Sin solución factible', 5000));
             break;
@@ -204,8 +205,16 @@ const simplexProcess = (matrix, BVS, header) => {
         BVS[pivotRow.index] = header[pivot];
         const pivotValue = matrix[pivotRow.index][pivot];
         matrix = iteration(matrix, pivotRow.index, pivot, pivotValue);
-        const step = matrix.map((row, i) => [i, BVS[i], ...row]);
+        const r = ['N/A', ...ratios.map(ratio => ratio.value)];
+        let h = [...header];
+      
+        h.push('Radios');
+        console.log('Header'), console.table(h);
+        const step = matrix.map((row, i) => [i, BVS[i], ...row, r[i]]);
+       //// console.log('Step');
+        //console.table(step);
         Store.dispatch(setSteps(step));
+        Store.dispatch(setHeader(h));
     }
     
 
