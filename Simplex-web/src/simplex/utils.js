@@ -1,5 +1,6 @@
 import Store from "../store";
 import { setSteps } from '../reducers/tableReducer';
+import { setNotification } from "../reducers/notificationReducer";
 
 const iteration = (matrix, pivotRow, pivotCol, pivotValue) =>{
     if (pivotValue != 1){
@@ -197,7 +198,7 @@ const simplexProcess = (matrix, BVS, header) => {
         const pivot = findPivot(matrix[0]);
         const pivotRow = findPivotRow(matrix, pivot);
         if (pivotRow === -1) {
-            alert('No solution');
+            Store.dispatch(setNotification('Sin solución factible', 5000));
             break;
         }
         BVS[pivotRow.index] = header[pivot];
@@ -242,11 +243,73 @@ function removeColumn(matrix, column) {
     });
 }
 
+function insertColumn(matrix, newColumn, columnIndex) {
+    matrix.forEach((row, i) => {
+        row.splice(columnIndex, 0, newColumn[i]);
+    });
+    return matrix;
+}
+
+const addUnrestrictedVariables = (matrix, header, variables, unrestricted) => {    
+    const free = unrestricted.map(entry => {
+        if (Object.values(entry)[0] === 1){
+            return Object.keys(entry)[0]
+        }
+    }).filter(item => item !== undefined);
+    
+    // add unrestricted variables to the matrix
+    // if the unrestricted variable is x1, we add x1p and x1pp to the matrix
+    // so x1 = x1p - x1pp
+
+    for (let i = 0; i < free.length; i++){
+        const index = header.indexOf(free[i]);        
+        const column = matrix.map(row => row[index]);
+        const newColumn = column.map(item=> {
+            return -1 * item 
+        });        
+        insertColumn(matrix, newColumn, index + 1);
+        header[index] = `${header[index]}p`;
+        header.splice(index + 1, 0, `${header[index]}p`);        
+    }
+    return { matrix, header };
+}
+
+const solveEquation = (matrix, BVS) => {
+    const freeInBVS = BVS.filter(item => item.includes('p'));
+    
+    const results = [];
+    for (let i = 0; i < freeInBVS.length; i++){
+        const original = freeInBVS[i].replace('p', '').replace('p', '');
+
+        const varPrimeIndex = BVS.indexOf(freeInBVS[i]);
+        const varDoublePrimeIndex = BVS.indexOf(`${original}pp`);
+
+        console.log({varPrimeIndex, varDoublePrimeIndex});
+        let x = 0;
+
+        if (varPrimeIndex === -1 && varDoublePrimeIndex === -1){            
+            break;
+        }
+        else if (varPrimeIndex === -1){
+            x = 0 - matrix[varDoublePrimeIndex][matrix[varDoublePrimeIndex].length - 1];
+        }
+        else if (varDoublePrimeIndex === -1){
+            x = matrix[varPrimeIndex][matrix[varPrimeIndex].length - 1];
+        }
+        else {
+            x = matrix[varPrimeIndex][matrix[varPrimeIndex].length - 1] - matrix[varDoublePrimeIndex][matrix[varDoublePrimeIndex].length - 1];
+        }
+        results.push({[original]: x});
+    }
+    return results;
+}
+
 
 export { 
     iteration, findPivotRow, showMatrix, 
     showResults, buildBVS, findPivot, 
     buildRestrictions, getOtherVariablesCount, 
     buildZ, rowMult, rowAddition, 
-    simplexProcess, buildMatrix, removeColumn, buildHeader
+    simplexProcess, buildMatrix, removeColumn, 
+    buildHeader, addUnrestrictedVariables, solveEquation
 };

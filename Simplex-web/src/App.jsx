@@ -1,3 +1,4 @@
+import Notification from "./components/Notification"
 import Config from "./components/Config"
 import Inputs from "./components/Inputs"
 import Table from "./components/Table"
@@ -10,6 +11,7 @@ function App() {
   return (
     <div id="main-frame">
       <h1>Simplex</h1>
+      <Notification />
       <Config />
       <Inputs />
       <Table />

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { setVariables, setRestricciones, setTarget, setMethod } from '../reducers/configReducer'
 
 // import '../styles/Config.css'
@@ -10,6 +10,8 @@ const Config = () => {
     const [simplexMethod, setSimplexMethod] = useState("simplex")
 
     const dispatch = useDispatch()
+
+    const selectedMethod = useSelector(state => state.config.method)
 
     const handleVariables = (e) => {
       dispatch(setVariables(e.target.value))
@@ -42,7 +44,7 @@ const Config = () => {
           </div>
           <div>
             <label htmlFor="method">Método:</label>
-            <select id="method" value={simplexMethod} onChange={handleMethod}>
+            <select id="method" value={selectedMethod} onChange={handleMethod}>
               <option value="simplex">Simplex</option>
               <option value="big-m">Gran M</option>
               <option value="two-phase">Dos Fases</option>

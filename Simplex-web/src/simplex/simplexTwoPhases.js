@@ -1,6 +1,7 @@
 import { rowAddition, simplexProcess, removeColumn, findPivot, iteration } from "./utils";
 import { setSteps } from '../reducers/tableReducer';
 import Store from "../store";
+import { setNotification } from "../reducers/notificationReducer";
 
 const buildW = (variables, counts) => {
     const { slackCount, artificialCount } = counts;
@@ -38,8 +39,8 @@ const simplexTwoPhases = (matrix, BVS, header, artificialCount) => {
     const headerPhaseOne = phaseOne.header;
 
     for(let i = 0; i < matrixPhaseOne[0].length; i++) {
-        if (matrixPhaseOne[0][i] > 0 && matrixPhaseOne[0][matrixPhaseOne[0].length - 1] != 0) {
-            alert('The problem is infeasible');
+        if (matrixPhaseOne[0][i] > 0 && matrixPhaseOne[0][matrixPhaseOne[0].length - 1] != 0) {            
+            Store.dispatch(setNotification('Sin solución factible', 5000));
             break;
         }
     }

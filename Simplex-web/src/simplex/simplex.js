@@ -1,18 +1,19 @@
 import Store from "../store";
+import { setNotification } from "../reducers/notificationReducer";
 import { resetTable, setHeader } from '../reducers/tableReducer';
 import { buildW, simplexTwoPhases } from "./simplexTwoPhases";
 import { simplexBigM } from "./simplexBigM";
 import { 
     showMatrix, showResults, buildZ, simplexProcess,
-    getOtherVariablesCount, buildHeader, buildBVS, buildRestrictions 
+    getOtherVariablesCount, buildHeader, buildBVS,
+    buildRestrictions, addUnrestrictedVariables, solveEquation
 } from "./utils";
 
 const Simplex = () => {
     // access the simplex reducer
     Store.dispatch(resetTable())
-    const {variables, restrictions } = Store.getState().simplex;
-    const {target, method} = Store.getState().config;
-
+    const {variables, restrictions, unrestricted } = Store.getState().simplex;    
+    const {target, method} = Store.getState().config;    
     const counts = getOtherVariablesCount(restrictions);
     
     let simplexResults = {};
@@ -21,6 +22,8 @@ const Simplex = () => {
     const restrictionMatrix = buildRestrictions(restrictions);
     const BVS = buildBVS(header, restrictionMatrix, variables.length, method);
     const matrix = [Z, ...restrictionMatrix];
+
+    addUnrestrictedVariables(matrix, header, variables, unrestricted);
 
     if (method === 'simplex') {
         simplexResults = simplexProcess(matrix, BVS, header);        
@@ -41,9 +44,14 @@ const Simplex = () => {
         simplexResults.matrix[0][length - 1] = simplexResults.matrix[0][length - 1] * -1;
     }
     
+    solveEquation(simplexResults.matrix, simplexResults.BVS);
+
     Store.dispatch(setHeader(header));
     showMatrix(simplexResults.matrix, simplexResults.BVS, header);
     showResults(simplexResults.matrix, simplexResults.BVS);
+
+    //Store.dispatch(setNotification('Proceso Completado', 5000));
+
 }
 
 

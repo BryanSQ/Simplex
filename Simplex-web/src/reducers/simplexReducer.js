@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   variables: [],
   restrictions: [],
+  unrestricted: [],
 };
 
 const simplexSlice = createSlice({
@@ -15,8 +16,11 @@ const simplexSlice = createSlice({
     setRestrictions(state, action) {
       state.restrictions = action.payload;
     },
+    setUnrestricted(state, action) {
+      state.unrestricted = action.payload;
+    }
   },
 });
 
-export const { setVariables, setRestrictions } = simplexSlice.actions;
+export const { setVariables, setRestrictions, setUnrestricted } = simplexSlice.actions;
 export default simplexSlice.reducer;
