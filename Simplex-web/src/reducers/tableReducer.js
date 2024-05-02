@@ -5,6 +5,7 @@ const initialState = {
     header: [],
     BVS: [],
     steps: [],
+    swaps: []
 }
 
 const tableSlice = createSlice({
@@ -12,7 +13,7 @@ const tableSlice = createSlice({
     initialState,
     reducers: {
         setHeader(state, action) {
-            state.header.push(...action.payload)
+            state.header.push(action.payload)
         },
         setBVS(state, action) {
             state.BVS = action.payload
@@ -23,14 +24,18 @@ const tableSlice = createSlice({
         setSteps(state, action) {
             state.steps.push(action.payload)
         },
+        setSwaps(state, action) {
+            state.swaps.push(action.payload)
+        },
         resetTable(state) {
             state.matrix = []
             state.header = []
             state.BVS = []
             state.steps = []
+            state.swaps = []
         }
     }
 });
 
-export const { setMatrix, setHeader, setBVS, setSteps, resetTable } = tableSlice.actions;
+export const { setMatrix, setHeader, setBVS, setSteps, resetTable, setSwaps } = tableSlice.actions;
 export default tableSlice.reducer;

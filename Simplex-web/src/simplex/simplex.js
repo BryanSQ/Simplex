@@ -32,7 +32,8 @@ const Simplex = () => {
         simplexResults = simplexBigM(matrix, BVS, header, counts.artificialCount);
     }
     else if (method === 'two-phase') {
-        const matrixW = [buildW(variables, counts), ...matrix];        
+        const matrixW = [buildW(variables, counts), ...matrix];
+        console.log(matrixW);  
         simplexResults = simplexTwoPhases(matrixW, BVS, header, counts.artificialCount);
     }
     else {
@@ -46,7 +47,15 @@ const Simplex = () => {
     
     solveEquation(simplexResults.matrix, simplexResults.BVS);
 
-    Store.dispatch(setHeader(header));
+    const extendedHeader = ['i', 'BVS', ...header, "RHS"];
+    console.log(extendedHeader);
+
+    console.log('headers antes', Store.getState().table.header);
+
+    Store.dispatch(setHeader(extendedHeader));
+
+    console.log('headers despues', Store.getState().table.header);
+
     showMatrix(simplexResults.matrix, simplexResults.BVS, header);
     showResults(simplexResults.matrix, simplexResults.BVS);
 

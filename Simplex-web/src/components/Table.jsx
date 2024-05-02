@@ -12,7 +12,8 @@ const Table = () => {
     const [data, setData] = useState([])
 
     const header = useSelector((state) => state.table.header)
-    const fullHeader = ['i', 'BVS', ...header, "RHS"]
+    const swaps = useSelector((state) => state.table.swaps)
+    console.log(swaps);
     let steps = useSelector((state) => state.table.steps)
 
     useEffect(() => {
@@ -51,18 +52,34 @@ const Table = () => {
             <table>
                 <thead>
                     <tr>
-                        {fullHeader.map((item, key) => (
-                            <th key={key}>{item}</th>
+                        {header[currentStep].map((item, key) => (
+                            <>
+                                {
+                                    item === swaps[currentStep].in 
+                                        ? ( <th key={key} className="in">{item}</th> ) 
+                                        : ( <th key={key}>{item}</th> )
+                                }
+                            </>
                         ))}
                     </tr>
                 </thead>
                 <tbody>
-                    {data[currentStep].map((row, key) => (
-                        <tr key={key}>
-                            {row.map((item, key) => (
-                                <td key={key}>{item}</td>
-                            ))}
-                        </tr>
+                    {data[currentStep].map((row, rowIndex) => (
+                        <tr key={rowIndex}>
+                        {row.map((item, colIndex) => (
+                            <>
+                                {
+                                    item === swaps[currentStep].out 
+                                        ? ( <td key={colIndex} className="out">{item}</td> ) 
+                                        : ( 
+                                            ( colIndex === data[currentStep][rowIndex].length - 1 && item === swaps[currentStep].ratio )
+                                                ? ( <td key={colIndex} className="ratio">{item}</td> )
+                                                : ( <td key={colIndex}>{item}</td> )                                            
+                                          )
+                                }
+                            </>
+                        ))}
+                    </tr>
                     ))}
                 </tbody>
             </table>
@@ -81,7 +98,7 @@ const Table = () => {
                 </button>
             </div>
         </div>
-    )
+    );
 }
 
 export default Table

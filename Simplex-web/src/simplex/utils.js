@@ -1,5 +1,5 @@
 import Store from "../store";
-import { setSteps, setHeader } from '../reducers/tableReducer';
+import { setSteps, setHeader, setSwaps } from '../reducers/tableReducer';
 import { setNotification } from "../reducers/notificationReducer";
 
 const iteration = (matrix, pivotRow, pivotCol, pivotValue) =>{
@@ -193,8 +193,7 @@ const buildZ = (variables, counts, target, method) =>{
     return z;
 }
 
-const simplexProcess = (matrix, BVS, header) => {
-    Store.dispatch(setSteps(matrix.map((row, i) => [i, BVS[i], ...row])));
+const simplexProcess = (matrix, BVS, header) => {    
     while (matrix[0].slice(0, matrix[0].length-1).some(value => value < 0)) {
         const pivot = findPivot(matrix[0]);
         const { pivotRow, ratios } = findPivotRow(matrix, pivot);
@@ -202,21 +201,24 @@ const simplexProcess = (matrix, BVS, header) => {
             Store.dispatch(setNotification('Sin solución factible', 5000));
             break;
         }
-        BVS[pivotRow.index] = header[pivot];
+
         const pivotValue = matrix[pivotRow.index][pivot];
-        matrix = iteration(matrix, pivotRow.index, pivot, pivotValue);
+
         const r = ['N/A', ...ratios.map(ratio => ratio.value)];
-        let h = [...header];
-      
-        h.push('Radios');
-        console.log('Header'), console.table(h);
+        console.log(BVS);
         const step = matrix.map((row, i) => [i, BVS[i], ...row, r[i]]);
-       //// console.log('Step');
-        //console.table(step);
+        const newHeader = ['i', 'BVS', ...header, 'RHS', 'Radios']
         Store.dispatch(setSteps(step));
-        Store.dispatch(setHeader(h));
+        Store.dispatch(setHeader(newHeader));
+
+        matrix = iteration(matrix, pivotRow.index, pivot, pivotValue);
+        console.log(BVS[pivotRow.index], header[pivot], r[pivotRow.index]);
+        Store.dispatch(setSwaps({out: BVS[pivotRow.index], in: header[pivot], ratio: r[pivotRow.index]}));
+        BVS[pivotRow.index] = header[pivot];
+
     }
-    
+    Store.dispatch(setHeader(['i', 'BVS', ...header, 'RHS']));
+    Store.dispatch(setSteps(matrix.map((row, i) => [i, BVS[i], ...row])));
 
     return { matrix, BVS };
 }

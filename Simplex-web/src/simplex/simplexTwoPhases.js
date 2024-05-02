@@ -1,5 +1,5 @@
 import { rowAddition, simplexProcess, removeColumn, findPivot, iteration } from "./utils";
-import { setSteps } from '../reducers/tableReducer';
+import { setHeader, setSteps, setSwaps  } from '../reducers/tableReducer';
 import Store from "../store";
 import { setNotification } from "../reducers/notificationReducer";
 
@@ -63,23 +63,30 @@ const phaseTwoPreparation = (matrix, BVS, header, artificialCount) =>{
     return { preparedMatrix, preparedBVS: BVS, preparedHeader: header };
 }
 
-const simplexProcessPhaseOne = (matrix, BVS, header) => {
-    Store.dispatch(setSteps(matrix.map((row, i) => [i, BVS[i], ...row])));    
+const simplexProcessPhaseOne = (matrix, BVS, header) => { 
     while (matrix[0].slice(0, matrix[0].length-1).some(value => value < 0)) {
         const pivot = findPivot(matrix[0]);
         const { pivotRow, ratios } = findPivotRow(matrix, pivot);
         if (pivotRow === -1) {
-            alert('No solution');
+            Store.dispatch(setNotification('Sin solución factible', 5000));
             break;
         }
-        BVS[pivotRow.index] = header[pivot];
-        const pivotValue = matrix[pivotRow.index][pivot];        
-        matrix = iteration(matrix, pivotRow.index, pivot, pivotValue);
+
+        const pivotValue = matrix[pivotRow.index][pivot];   
+        
         const r = ['N/A', 'N/A', ...ratios.map(ratio => ratio.value)];
+        const newHeader = ['i', 'BVS', ...header, 'RHS', 'Radios'];
         const step = matrix.map((row, i) => [i, BVS[i], ...row, r[i]]);
-      
+        Store.dispatch(setHeader(newHeader));
         Store.dispatch(setSteps(step));       
+        
+        matrix = iteration(matrix, pivotRow.index, pivot, pivotValue);
+        console.log(BVS[pivotRow.index], header[pivot], pivotRow.index);
+        Store.dispatch(setSwaps({ out: BVS[pivotRow.index], in: header[pivot], ratio: r[pivotRow.index] }));
+        BVS[pivotRow.index] = header[pivot];
     }
+    Store.dispatch(setHeader(['i', 'BVS', ...header, 'RHS']));
+    Store.dispatch(setSteps(matrix.map((row, i) => [i, BVS[i], ...row])));
     
     return { matrix,  BVS, header };
 }
