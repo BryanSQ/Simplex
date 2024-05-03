@@ -139,7 +139,7 @@ const Inputs = () => {
                 {
                   Array.from({ length: variables }, (_, i) => (
                     <span key={i} className="item">
-                      <input id={`input-x${i}`} type="number" />
+                      <input id={`input-x${i}`} type="number"/>
                       <label htmlFor={`input-x${i}`}>
                         X<sub>{i + 1}</sub>
                       </label>

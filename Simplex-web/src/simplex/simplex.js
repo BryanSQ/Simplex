@@ -1,6 +1,6 @@
 import Store from "../store";
 import { setNotification } from "../reducers/notificationReducer";
-import { resetTable, setHeader } from '../reducers/tableReducer';
+import { resetTable, setHeader, setResults } from '../reducers/tableReducer';
 import { buildW, simplexTwoPhases } from "./simplexTwoPhases";
 import { simplexBigM } from "./simplexBigM";
 import { 
@@ -33,11 +33,10 @@ const Simplex = () => {
     }
     else if (method === 'two-phase') {
         const matrixW = [buildW(variables, counts), ...matrix];
-        console.log(matrixW);  
         simplexResults = simplexTwoPhases(matrixW, BVS, header, counts.artificialCount);
     }
     else {
-        console.log('Invalid method');
+        Store.dispatch(setNotification('Método inválido', 5000));
     }
     
     if (target === 'min'){
@@ -45,24 +44,45 @@ const Simplex = () => {
         simplexResults.matrix[0][length - 1] = simplexResults.matrix[0][length - 1] * -1;
     }
     
-    solveEquation(simplexResults.matrix, simplexResults.BVS);
+    const r = solveEquation(simplexResults.matrix, simplexResults.BVS);    
+
+    let RHS = simplexResults.matrix.map(row => row[row.length - 1]);
+
+    const changes = changeValues(simplexResults.BVS, r, RHS);
+    
+    if (changes){
+        RHS = changes.RHS;
+        simplexResults.BVS = changes.BVS;
+    }
 
     const extendedHeader = ['i', 'BVS', ...header, "RHS"];
-    console.log(extendedHeader);
-
-    console.log('headers antes', Store.getState().table.header);
 
     Store.dispatch(setHeader(extendedHeader));
+    Store.dispatch(setResults({BVS: simplexResults.BVS, RHS}));
 
-    console.log('headers despues', Store.getState().table.header);
-
+    
     showMatrix(simplexResults.matrix, simplexResults.BVS, header);
     showResults(simplexResults.matrix, simplexResults.BVS);
-
-    //Store.dispatch(setNotification('Proceso Completado', 5000));
-
 }
 
+const changeValues = (BVS, results, RHS) => {
+    if (!results.length){
+        return null;
+    }
 
+    const newBVS = BVS.map((item) => {
+        return item.replace('p', '').replace('p', '');
+    });
+
+    for (let r of results){
+        const index = newBVS.indexOf(r[0]);
+        if (index !== -1){
+            RHS[index] = r[1];
+        }
+        
+    }
+
+    return { BVS: newBVS, RHS };
+}
 
 export default Simplex

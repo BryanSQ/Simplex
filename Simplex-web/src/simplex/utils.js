@@ -51,7 +51,7 @@ const findPivotRow = (matrix, pivot) => {
     })
 
     if (ratios.every(ratio => ratio.value === Infinity)) {
-        return -1;
+        return { index: -1, value: NaN};
     }
 
     const pivotRow = ratios.reduce((prev, current) => {
@@ -72,7 +72,7 @@ const showResults = (matrix, BVS) => {
     for (let i = 0; i < matrix.length; i++) {
         results[BVS[i]] = matrix[i][matrix[i].length - 1];
     }
-    console.log(results);
+    console.table(results);
 }
 
 const slackOrArtificial = (row) => {
@@ -197,28 +197,27 @@ const simplexProcess = (matrix, BVS, header) => {
     while (matrix[0].slice(0, matrix[0].length-1).some(value => value < 0)) {
         const pivot = findPivot(matrix[0]);
         const { pivotRow, ratios } = findPivotRow(matrix, pivot);
-        if (pivotRow === -1) {
-            Store.dispatch(setNotification('Sin solución factible', 5000));
+        if (!pivotRow) {
+            Store.dispatch(setNotification('Problema no acotado', 5000));
             break;
         }
-
+        
         const pivotValue = matrix[pivotRow.index][pivot];
 
-        const r = ['N/A', ...ratios.map(ratio => ratio.value)];
-        console.log(BVS);
+        const r = ['N/A', ...ratios.map(ratio => ratio.value)];        
         const step = matrix.map((row, i) => [i, BVS[i], ...row, r[i]]);
         const newHeader = ['i', 'BVS', ...header, 'RHS', 'Radios']
         Store.dispatch(setSteps(step));
         Store.dispatch(setHeader(newHeader));
 
         matrix = iteration(matrix, pivotRow.index, pivot, pivotValue);
-        console.log(BVS[pivotRow.index], header[pivot], r[pivotRow.index]);
         Store.dispatch(setSwaps({out: BVS[pivotRow.index], in: header[pivot], ratio: r[pivotRow.index]}));
         BVS[pivotRow.index] = header[pivot];
 
     }
     Store.dispatch(setHeader(['i', 'BVS', ...header, 'RHS']));
     Store.dispatch(setSteps(matrix.map((row, i) => [i, BVS[i], ...row])));
+    Store.dispatch(setSwaps({out: 'N/A', in: 'N/A', ratio: 'N/A'}));
 
     return { matrix, BVS };
 }
@@ -294,8 +293,7 @@ const solveEquation = (matrix, BVS) => {
 
         const varPrimeIndex = BVS.indexOf(freeInBVS[i]);
         const varDoublePrimeIndex = BVS.indexOf(`${original}pp`);
-
-        console.log({varPrimeIndex, varDoublePrimeIndex});
+        
         let x = 0;
 
         if (varPrimeIndex === -1 && varDoublePrimeIndex === -1){            
