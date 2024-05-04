@@ -15,6 +15,12 @@ const Simplex = () => {
     const {variables, restrictions, unrestricted } = Store.getState().simplex;    
     const {target, method} = Store.getState().config;    
     const counts = getOtherVariablesCount(restrictions);
+    console.log('variables', variables.length);
+    console.log('restrictions', restrictions.length);
+    if (isValidInput(variables) || isValidInput(restrictions)){
+        Store.dispatch(setNotification('No se han ingresado variables o restricciones', 5000));
+        return;
+    }
     
     let simplexResults = {};
     const header = buildHeader(variables, counts);
@@ -32,7 +38,7 @@ const Simplex = () => {
         simplexResults = simplexBigM(matrix, BVS, header, counts.artificialCount);
     }
     else if (method === 'two-phase') {
-        const matrixW = [buildW(variables, counts), ...matrix];
+        const matrixW = [buildW(variables, counts, unrestricted), ...matrix];
         simplexResults = simplexTwoPhases(matrixW, BVS, header, counts.artificialCount);
     }
     else {
@@ -58,7 +64,8 @@ const Simplex = () => {
     const extendedHeader = ['i', 'BVS', ...header, "RHS"];
 
     Store.dispatch(setHeader(extendedHeader));
-    Store.dispatch(setResults({BVS: simplexResults.BVS, RHS}));
+    const { sortedBVS, sortedRHS } = sortResults({BVS: simplexResults.BVS, RHS});
+    Store.dispatch(setResults({BVS: sortedBVS, RHS: sortedRHS}));
 
     
     showMatrix(simplexResults.matrix, simplexResults.BVS, header);
@@ -84,5 +91,46 @@ const changeValues = (BVS, results, RHS) => {
 
     return { BVS: newBVS, RHS };
 }
+
+const sortResults = (results) => {
+    const { BVS, RHS } = results;
+    
+    const newResults = BVS.map((item, index) => {
+        return {[item]: RHS[index]};
+    });
+
+    newResults.sort((a, b) => {
+        const aKey = Object.keys(a)[0];
+        const bKey = Object.keys(b)[0];
+
+     
+        if (aKey === 'z') return -1;
+        if (bKey === 'z') return 1;
+
+      
+        const aNumber = parseInt(aKey.replace(/\D/g, ''), 10);
+        const bNumber = parseInt(bKey.replace(/\D/g, ''), 10);
+       
+        return aNumber - bNumber;
+    });
+
+    const sortedBVS = [];
+    const sortedRHS = [];
+    newResults.forEach((item) => {
+        const key = Object.keys(item)[0];
+        sortedBVS.push(key);
+        sortedRHS.push(item[key]);
+    });
+
+    return { sortedBVS, sortedRHS };
+}
+
+const isValidInput = (v) => {
+    const values = Object.values(v);
+    return values.every(value => value === '');
+}
+    
+
+
 
 export default Simplex

@@ -51,8 +51,9 @@ const findPivotRow = (matrix, pivot) => {
     })
 
     if (ratios.every(ratio => ratio.value === Infinity)) {
-        return { index: -1, value: NaN};
+        return { index: -1, ratios};
     }
+    console.log('ratios', ratios);
 
     const pivotRow = ratios.reduce((prev, current) => {
         return prev.value < current.value ? prev : current;
@@ -198,8 +199,15 @@ const simplexProcess = (matrix, BVS, header) => {
         const pivot = findPivot(matrix[0]);
         const { pivotRow, ratios } = findPivotRow(matrix, pivot);
         if (!pivotRow) {
-            Store.dispatch(setNotification('Problema no acotado', 5000));
-            break;
+            Store.dispatch(setNotification('Problema no acotado', 10000));
+            const r = ['N/A', ...ratios.map(ratio => ratio.value)];        
+            const step = matrix.map((row, i) => [i, BVS[i], ...row, r[i]]);
+            console.log('step en no acotado', step);
+            const newHeader = ['i', 'BVS', ...header, 'RHS', 'Radios']
+            Store.dispatch(setSteps(step));
+            Store.dispatch(setHeader(newHeader));
+            Store.dispatch(setSwaps({out: '', in: header[pivot], ratio: r['']}));
+            return { matrix: step, BVS };
         }
         
         const pivotValue = matrix[pivotRow.index][pivot];

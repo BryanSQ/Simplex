@@ -3,12 +3,18 @@ import { setHeader, setSteps, setSwaps  } from '../reducers/tableReducer';
 import Store from "../store";
 import { setNotification } from "../reducers/notificationReducer";
 
-const buildW = (variables, counts) => {
+const buildW = (variables, counts, unrestricted) => {
+    const unrestrictedCount = unrestricted.reduce((total, obj) => {
+  
+        const value = Object.values(obj)[0];
+        return total + value;
+    }, 0);
+    
     const { slackCount, artificialCount } = counts;
-    const total = variables.length + slackCount + artificialCount;
+    const total = variables.length + slackCount + artificialCount + unrestrictedCount;
     let w = []
     for (let i = 0; i < total; i++) {
-       if (i < (variables.length + slackCount)) {
+       if (i < (variables.length + slackCount + unrestrictedCount)) {
            w.push(0);
        } else {
            w.push(1);
@@ -18,7 +24,6 @@ const buildW = (variables, counts) => {
     w.push(0);
     return w;    
 }
-
 
 const simplexTwoPhases = (matrix, BVS, header, artificialCount) => {
     const end = matrix[0].length - 1;
@@ -45,24 +50,22 @@ const simplexTwoPhases = (matrix, BVS, header, artificialCount) => {
         }
     }
     
-    console.table(matrixPhaseOne);
+   
     const { preparedMatrix, preparedBVS, preparedHeader } = phaseTwoPreparation(matrixPhaseOne, BVSPhaseOne, headerPhaseOne, artificialCount);
-    console.table(preparedMatrix);
     const matrixPhaseTwo = simplexProcess(preparedMatrix, preparedBVS, preparedHeader);
     
     return matrixPhaseTwo;
 }
 
 const phaseTwoPreparation = (matrix, BVS, header, artificialCount) =>{
-
     let preparedMatrix = matrix.slice(1);
     const end = preparedMatrix[0].length - 1;
     const start = end - artificialCount;
     for (let i = start; i < end; i++) {
-        console.log('quita', i);
-        preparedMatrix = removeColumn(preparedMatrix, i);
-        header.splice(i, 1)
+        preparedMatrix = removeColumn(preparedMatrix, start);
+        header.splice(start, 1)
     }
+    
     BVS.splice(0, 1);
     return { preparedMatrix, preparedBVS: BVS, preparedHeader: header };
 }
@@ -85,7 +88,6 @@ const simplexProcessPhaseOne = (matrix, BVS, header) => {
         Store.dispatch(setSteps(step));       
         
         matrix = iteration(matrix, pivotRow.index, pivot, pivotValue);
-        console.log(BVS[pivotRow.index], header[pivot], pivotRow.index);
         Store.dispatch(setSwaps({ out: BVS[pivotRow.index], in: header[pivot], ratio: r[pivotRow.index] }));
         BVS[pivotRow.index] = header[pivot];
     }
