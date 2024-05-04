@@ -4,7 +4,7 @@ Esta aplicación está desplegada en Netlify.
 [Enlace a la aplicación](https://simplex-app.netlify.app/)
 
 # Autores
-Sebastián Fernandez y Bryan Sandí
+Sebastián Fernández y Bryan Sandí.
 
 # Herramientas utilizadas
  - Nodejs
