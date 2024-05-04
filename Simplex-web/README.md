@@ -1,7 +1,7 @@
 # Hosting
 Esta aplicación está desplegada en Netlify.
 
-link: ??
+[text](https://simplex-app.netlify.app/)
 
 # Autores
 Sebastián Fernandez y Bryan Sandí
