@@ -15,9 +15,8 @@ const Simplex = () => {
     const {variables, restrictions, unrestricted } = Store.getState().simplex;    
     const {target, method} = Store.getState().config;    
     const counts = getOtherVariablesCount(restrictions);
-    console.log('variables', variables.length);
-    console.log('restrictions', restrictions.length);
-    if (isValidInput(variables) || isValidInput(restrictions)){
+
+    if (noEmptyVariables(variables) || noEmptyRestrictions(restrictions)){
         Store.dispatch(setNotification('No se han ingresado variables o restricciones', 5000));
         return;
     }
@@ -49,6 +48,7 @@ const Simplex = () => {
         const length = simplexResults.matrix[0].length;
         simplexResults.matrix[0][length - 1] = simplexResults.matrix[0][length - 1] * -1;
     }
+
     
     const r = solveEquation(simplexResults.matrix, simplexResults.BVS);    
 
@@ -125,12 +125,25 @@ const sortResults = (results) => {
     return { sortedBVS, sortedRHS };
 }
 
-const isValidInput = (v) => {
-    const values = Object.values(v);
-    return values.every(value => value === '');
+const noEmptyVariables = (v) => {    
+    const values = v.map(item => Object.values(item)[0]);    
+    const result = values.every(value => value === undefined || value === '' || value === null);    
+    return result;
 }
-    
 
+const noEmptyRestrictions = (r) => {   
+    // create a new array with the objects of r without comp key and its value
+
+    const newR = r.map(item => {
+        const newItem = {...item};
+        delete newItem.comp;
+        return newItem;
+    });
+
+    const values = newR.map(item => Object.values(item));      
+    const result = values.every(value => value.every(val => val === undefined || val === '' || val === null));    
+    return result;
+}    
 
 
 export default Simplex

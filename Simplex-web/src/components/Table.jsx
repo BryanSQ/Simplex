@@ -22,6 +22,7 @@ const Table = () => {
         if (steps.length > 0) {
             setShowTable(true)
             setData(steps)
+            setCurrentStep(0)
         }
     }, [steps])
 

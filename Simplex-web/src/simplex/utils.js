@@ -52,8 +52,7 @@ const findPivotRow = (matrix, pivot) => {
 
     if (ratios.every(ratio => ratio.value === Infinity)) {
         return { index: -1, ratios};
-    }
-    console.log('ratios', ratios);
+    }    
 
     const pivotRow = ratios.reduce((prev, current) => {
         return prev.value < current.value ? prev : current;
@@ -201,8 +200,7 @@ const simplexProcess = (matrix, BVS, header) => {
         if (!pivotRow) {
             Store.dispatch(setNotification('Problema no acotado', 10000));
             const r = ['N/A', ...ratios.map(ratio => ratio.value)];        
-            const step = matrix.map((row, i) => [i, BVS[i], ...row, r[i]]);
-            console.log('step en no acotado', step);
+            const step = matrix.map((row, i) => [i, BVS[i], ...row, r[i]]);            
             const newHeader = ['i', 'BVS', ...header, 'RHS', 'Radios']
             Store.dispatch(setSteps(step));
             Store.dispatch(setHeader(newHeader));
